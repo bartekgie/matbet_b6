@@ -72,7 +72,7 @@ export default function GaleriaSection({ galeria }: { galeria: GaleriaItem[] }) 
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(27,45,79,0)' }}
               >
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" style={{ opacity: 0, transition: 'opacity 0.2s' }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.opacity = '1' }}
+                  onMouseEnter={e => { (e.currentTarget as unknown as HTMLElement).style.opacity = '1' }}
                 >
                   <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
