@@ -133,9 +133,6 @@ export default function Footer() {
           <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
             © 2025 – Matbet Sp. z o.o. Wszystkie prawa zastrzeżone.
           </span>
-          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
-            Realizacja: GetVisive
-          </span>
         </div>
       </div>
 

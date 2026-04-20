@@ -534,7 +534,12 @@ export default function WyszukiwarkaSection({ lokale }: { lokale: Lokal[] }) {
           </div>
         ) : (
           <div style={{ background: '#fff', borderRadius: 14, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,.06)' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+            <div className="tabela-swipe-hint">
+              <span>przesuń</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </div>
+            <div className="tabela-scroll">
+            <table style={{ width: '100%', minWidth: 520, borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
                 <tr style={{ background: '#f7f8fa', borderBottom: '2px solid #eee' }}>
                   {/* Checkbox col */}
@@ -606,6 +611,7 @@ export default function WyszukiwarkaSection({ lokale }: { lokale: Lokal[] }) {
                 })}
               </tbody>
             </table>
+            </div>
           </div>
         )}
       </div>
@@ -655,6 +661,34 @@ export default function WyszukiwarkaSection({ lokale }: { lokale: Lokal[] }) {
         }
         .tabela-row:hover {
           background: #f0f4ff !important;
+        }
+        .tabela-scroll {
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+        }
+        .tabela-swipe-hint {
+          display: none;
+        }
+        @media (max-width: 768px) {
+          .tabela-swipe-hint {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 14px 4px;
+            font-size: 11px;
+            color: #aaa;
+          }
+          .tabela-scroll table td,
+          .tabela-scroll table th {
+            padding: 10px 12px !important;
+          }
+          .tabela-scroll table {
+            min-width: 700px;
+          }
+          .tabela-scroll th:nth-child(5),
+          .tabela-scroll td:nth-child(5) {
+            min-width: 160px;
+          }
         }
       `}</style>
 
