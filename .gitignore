@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.claude/
+CLAUDE.md
+CLAUDE.local.md
+.mcp.json
+Daily\ Notes/
+Task\ Board.md
+Scratchpad.md

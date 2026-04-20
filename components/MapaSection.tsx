@@ -8,17 +8,31 @@ const COLORS = {
   textGray: '#6B7280',
 }
 
+const S = 18 // icon size
+const ICONS: Record<string, React.ReactElement> = {
+  beach:    <svg width={S} height={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="7" r="3"/><path d="M12 2v1M12 10v1M4.9 4.9l.7.7M17.7 17.3l.7.7M2 7h1M21 7h1M4.9 9.1l.7-.7M18.4 4.9l-.7.7"/><path d="M2 17c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M2 21c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/></svg>,
+  atm:      <svg width={S} height={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M7 15h.01M11 15h2"/></svg>,
+  cart:     <svg width={S} height={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>,
+  train:    <svg width={S} height={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="2" width="16" height="16" rx="2"/><path d="M4 10h16"/><path d="M12 2v8"/><circle cx="8.5" cy="14.5" r="1.5"/><circle cx="15.5" cy="14.5" r="1.5"/><path d="M7 22l2-4M17 22l-2-4"/></svg>,
+  plane:    <svg width={S} height={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>,
+  school:   <svg width={S} height={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+  hospital: <svg width={S} height={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>,
+  bus:      <svg width={S} height={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 6v6M15 6v6M2 12h19.6M18 18h2a1 1 0 0 0 1-1V6a3 3 0 0 0-3-3H6a3 3 0 0 0-3 3v11a1 1 0 0 0 1 1h2"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>,
+  tree:     <svg width={S} height={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L6 11h3L5 19h14L15 11h3L12 2z"/><path d="M12 19v3"/><path d="M10 22h4"/></svg>,
+  loop:     <svg width={S} height={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>,
+}
+
 const MIEJSCA = [
-  { ikona: '🏖️', nazwa: 'Ustka',             odl: '18 km'  },
-  { ikona: '🏧', nazwa: 'Bankomat',           odl: '400 m'  },
-  { ikona: '🛒', nazwa: 'Supermarket',        odl: '400 m'  },
-  { ikona: '🚂', nazwa: 'Stacja kolejowa',    odl: '4 km'   },
-  { ikona: '✈️', nazwa: 'Lotnisko',           odl: '120 km' },
-  { ikona: '🏫', nazwa: 'Szkoły',             odl: '200 m'  },
-  { ikona: '🏥', nazwa: 'Szpital',            odl: '3,5 km' },
-  { ikona: '🚌', nazwa: 'Przystanek',         odl: '100 m'  },
-  { ikona: '🌳', nazwa: 'Park Zachodni',      odl: '500 m'  },
-  { ikona: '🔄', nazwa: 'Pętla autobusowa',   odl: '900 m'  },
+  { ikona: ICONS.beach,    nazwa: 'Ustka',             odl: '18 km'  },
+  { ikona: ICONS.atm,      nazwa: 'Bankomat',           odl: '400 m'  },
+  { ikona: ICONS.cart,     nazwa: 'Supermarket',        odl: '400 m'  },
+  { ikona: ICONS.train,    nazwa: 'Stacja kolejowa',    odl: '4 km'   },
+  { ikona: ICONS.plane,    nazwa: 'Lotnisko',           odl: '120 km' },
+  { ikona: ICONS.school,   nazwa: 'Szkoły',             odl: '200 m'  },
+  { ikona: ICONS.hospital, nazwa: 'Szpital',            odl: '3,5 km' },
+  { ikona: ICONS.bus,      nazwa: 'Przystanek',         odl: '100 m'  },
+  { ikona: ICONS.tree,     nazwa: 'Park Zachodni',      odl: '500 m'  },
+  { ikona: ICONS.loop,     nazwa: 'Pętla autobusowa',   odl: '900 m'  },
 ]
 
 const STREET_VIEW_SRC = 'https://www.google.com/maps/embed?pb=!4v1776367986058!6m8!1m7!1sAErv5rsj5UU4tqp3WDf40w!2m2!1d54.46536378406788!2d16.98121339286148!3f295.57545326196043!4f-1.7544951324730391!5f0.7820865974627469'
@@ -37,17 +51,19 @@ export default function MapaSection({
 
   useEffect(() => {
     const grid = gridRef.current
-    if (!grid || window.innerWidth > 768) return
+    if (!grid) return
     const reveal = () => setRevealed(true)
     // Jeśli sekcja już widoczna przy montażu — od razu odkryj
     const rect = grid.getBoundingClientRect()
     if (rect.top < window.innerHeight) { reveal(); return }
     const io = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) { reveal(); io.disconnect() } },
-      { threshold: 0 }
+      { threshold: 0, rootMargin: '0px 0px 100px 0px' }
     )
     io.observe(grid)
-    return () => io.disconnect()
+    // Fallback: iOS Safari może nie odpalić observera — odkryj po 1.5s
+    const fallback = setTimeout(reveal, 1500)
+    return () => { io.disconnect(); clearTimeout(fallback) }
   }, [])
 
   return (
@@ -72,11 +88,11 @@ export default function MapaSection({
             {/* Odległości — 2 kolumny */}
             <div ref={gridRef} className={`miejsca-grid${revealed ? ' miejsca-revealed' : ''}`} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 12px', marginBottom: 32 }}>
               {MIEJSCA.map(m => (
-                <div key={m.nazwa} className="miejsca-tile" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', borderRadius: 8, background: '#f8f9fb', border: '1px solid #eaecf0' }}>
-                  <span className="miejsca-emoji" style={{ fontSize: 18, flexShrink: 0 }}>{m.ikona}</span>
-                  <div className="miejsca-info" style={{ flex: 1, minWidth: 0 }}>
-                    <div className="miejsca-name" style={{ fontSize: 12, color: COLORS.textGray, fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.nazwa}</div>
-                    <div className="miejsca-dist" style={{ fontSize: 14, color: COLORS.navy, fontWeight: 800 }}>{m.odl}</div>
+                <div key={m.nazwa} className="miejsca-tile" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '10px 8px', borderRadius: 8, background: '#f8f9fb', border: '1px solid #eaecf0', textAlign: 'center' }}>
+                  <span className="miejsca-emoji" style={{ flexShrink: 0, color: COLORS.navy, display: 'flex' }}>{m.ikona}</span>
+                  <div className="miejsca-info" style={{ minWidth: 0, width: '100%' }}>
+                    <div className="miejsca-name" style={{ fontSize: 11, color: COLORS.textGray, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.nazwa}</div>
+                    <div className="miejsca-dist" style={{ fontSize: 13, color: COLORS.navy, fontWeight: 800 }}>{m.odl}</div>
                   </div>
                 </div>
               ))}
@@ -86,6 +102,7 @@ export default function MapaSection({
               href="https://maps.app.goo.gl/18VAFkZofywjL8g69"
               target="_blank"
               rel="noopener noreferrer"
+              className="mapa-maps-btn"
               style={{
                 display: 'inline-block',
                 padding: '12px 24px',
@@ -125,6 +142,7 @@ export default function MapaSection({
         }
         @media (max-width: 768px) {
           .mapa-grid { grid-template-columns: 1fr !important; }
+          .mapa-maps-btn { display: block !important; text-align: center; }
           .miejsca-grid { grid-template-columns: repeat(5, 1fr) !important; gap: 4px !important; margin-bottom: 20px !important; }
           .miejsca-tile {
             flex-direction: column !important; align-items: center !important;
@@ -132,7 +150,7 @@ export default function MapaSection({
             opacity: 0; transform: translateY(10px);
             transition: opacity 0.35s ease, transform 0.35s ease;
           }
-          .miejsca-emoji { font-size: 15px !important; }
+          .miejsca-emoji { width: 16px !important; height: 16px !important; }
           .miejsca-info { flex: none !important; width: 100%; }
           .miejsca-name {
             font-size: 9px !important; white-space: normal !important;

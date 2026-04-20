@@ -23,6 +23,7 @@ const INIT_FILTRY = { pokoje: '', pietro: '', status: '' }
 
 type Sortowanie = 'cena_asc' | 'cena_desc' | 'pow_asc' | 'pow_desc' | 'pietro_asc' | 'pietro_desc' | 'pokoje_asc' | 'pokoje_desc'
 type Widok = 'kafelki' | 'tabela'
+type TableSortCol = 'nr' | 'pietro' | 'pokoje' | 'powierzchnia' | 'cena' | 'cenaZaMetr'
 
 const SORT_OPCJE: { value: Sortowanie; label: string }[] = [
   { value: 'cena_asc',    label: 'Cena: od najniższej' },
@@ -244,6 +245,14 @@ export default function WyszukiwarkaSection({ lokale }: { lokale: Lokal[] }) {
   const [porownaj, setPorownaj]     = useState<string[]>([])
   const [showModal, setShowModal]   = useState(false)
   const [powRange, setPowRange]     = useState<[number, number]>([0, 9999])
+  const [tableSort, setTableSort]   = useState<{ col: TableSortCol | null; dir: 'asc' | 'desc' }>({ col: null, dir: 'asc' })
+
+  const handleTableSort = (col: TableSortCol) => {
+    setTableSort(prev => prev.col === col
+      ? { col, dir: prev.dir === 'asc' ? 'desc' : 'asc' }
+      : { col, dir: 'asc' }
+    )
+  }
 
   useEffect(() => {
     document.body.style.overflow = showModal ? 'hidden' : ''
@@ -286,6 +295,21 @@ export default function WyszukiwarkaSection({ lokale }: { lokale: Lokal[] }) {
     })
     return sortuj(filtered, sortowanie)
   }, [lokale, filtry, sortowanie, powRange])
+
+  const tabelaWyniki = useMemo(() => {
+    if (!tableSort.col) return przefiltrowane
+    const { col, dir } = tableSort
+    return [...przefiltrowane].sort((a, b) => {
+      let va = 0, vb = 0
+      if (col === 'nr')          { va = parseInt(a.nr) || 0; vb = parseInt(b.nr) || 0 }
+      if (col === 'pietro')      { va = a.pietro;            vb = b.pietro }
+      if (col === 'pokoje')      { va = a.pokoje;            vb = b.pokoje }
+      if (col === 'powierzchnia'){ va = a.powierzchnia;      vb = b.powierzchnia }
+      if (col === 'cena')        { va = (a.cenaZaMetr ?? 0) * a.powierzchnia; vb = (b.cenaZaMetr ?? 0) * b.powierzchnia }
+      if (col === 'cenaZaMetr')  { va = a.cenaZaMetr ?? 0;  vb = b.cenaZaMetr ?? 0 }
+      return dir === 'asc' ? va - vb : vb - va
+    })
+  }, [przefiltrowane, tableSort])
 
   const wybraneObiekty = porownaj.map(id => lokale.find(l => l._id === id)).filter(Boolean) as Lokal[]
 
@@ -513,18 +537,43 @@ export default function WyszukiwarkaSection({ lokale }: { lokale: Lokal[] }) {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
                 <tr style={{ background: '#f7f8fa', borderBottom: '2px solid #eee' }}>
-                  {['', 'Nr', 'Piętro', 'Pokoje', 'Powierzchnia', 'Cena', 'Cena/m²', 'Balkon', 'Status', ''].map((h, i) => (
+                  {/* Checkbox col */}
+                  <th style={{ padding: '12px 16px', width: 36 }} />
+                  {([
+                    { label: 'Nr',           col: 'nr'          as TableSortCol },
+                    { label: 'Piętro',       col: 'pietro'      as TableSortCol },
+                    { label: 'Pokoje',       col: 'pokoje'      as TableSortCol },
+                    { label: 'Powierzchnia', col: 'powierzchnia'as TableSortCol },
+                    { label: 'Cena',         col: 'cena'        as TableSortCol },
+                    { label: 'Cena/m²',      col: 'cenaZaMetr'  as TableSortCol },
+                  ] as { label: string; col: TableSortCol }[]).map(({ label, col }) => {
+                    const active = tableSort.col === col
+                    return (
+                      <th
+                        key={col}
+                        onClick={() => handleTableSort(col)}
+                        style={{ padding: '12px 16px', textAlign: 'left', fontSize: 10, fontWeight: 700, color: active ? COLORS.navy : '#999', letterSpacing: 1, cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}
+                      >
+                        {label}
+                        <span style={{ marginLeft: 4, opacity: active ? 1 : 0.3 }}>
+                          {active ? (tableSort.dir === 'asc' ? '↑' : '↓') : '↕'}
+                        </span>
+                      </th>
+                    )
+                  })}
+                  {/* Balkon, Status, action */}
+                  {['Balkon', 'Status', ''].map((h, i) => (
                     <th key={i} style={{ padding: '12px 16px', textAlign: 'left', fontSize: 10, fontWeight: 700, color: '#999', letterSpacing: 1 }}>{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {przefiltrowane.map((l, i) => {
+                {tabelaWyniki.map((l, i) => {
                   const c = STATUS_COLORS[l.status] || STATUS_COLORS.wolne
                   const wPorownaniu = porownaj.includes(l._id)
                   const maxOsiagniete = porownaj.length >= 3 && !wPorownaniu
                   return (
-                    <tr key={l._id} className="tabela-row" onClick={(e) => { if ((e.target as HTMLElement).closest('a, button')) return; router.push(`/lokal/${l._id}`) }} style={{ borderBottom: '1px solid #f0f0f0', background: wPorownaniu ? '#f0f4ff' : i % 2 === 0 ? '#fff' : '#fafafa', outline: wPorownaniu ? '2px solid #4f7cff' : 'none', outlineOffset: -2 }}>
+                    <tr key={l._id} className="tabela-row" onClick={(e) => { if ((e.target as HTMLElement).closest('a, button')) return; router.push(`/lokal/${l._id}`) }} style={{ borderBottom: '1px solid #f0f0f0', background: wPorownaniu ? '#f0f4ff' : i % 2 === 0 ? '#fff' : '#fafafa', outline: wPorownaniu ? '2px solid #4f7cff' : 'none', outlineOffset: -2  }}>
                       <td style={{ padding: '10px 12px 10px 16px', width: 36 }}>
                         <button onClick={() => togglePorownaj(l._id)} disabled={maxOsiagniete} style={{ width: 22, height: 22, borderRadius: 6, border: '2px solid', borderColor: wPorownaniu ? '#4f7cff' : '#ddd', background: wPorownaniu ? '#4f7cff' : '#fff', color: wPorownaniu ? '#fff' : 'transparent', cursor: maxOsiagniete ? 'not-allowed' : 'pointer', fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: maxOsiagniete ? .4 : 1 }}>
                           {wPorownaniu ? '✓' : ''}
