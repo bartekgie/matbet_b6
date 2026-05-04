@@ -31,7 +31,7 @@ const LINKI = [
 export default function Footer() {
   return (
     <footer style={{ background: COLORS.navy, padding: '60px 0 0 0', fontFamily: 'sans-serif' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
+      <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 32px' }}>
 
         {/* Górna część — 3 kolumny */}
         <div style={{

@@ -56,7 +56,7 @@ export default function Navbar({ budynekNazwa }: { budynekNazwa: string }) {
       transition: 'box-shadow 0.2s',
     }}>
       <div className="nav-inner" style={{
-        maxWidth: 1200, margin: '0 auto', padding: '0 32px',
+        maxWidth: 1400, margin: '0 auto', padding: '0 32px',
         height: '100%', display: 'flex', alignItems: 'center', gap: 24,
       }}>
 
@@ -91,7 +91,7 @@ export default function Navbar({ budynekNazwa }: { budynekNazwa: string }) {
 
         {/* CTA */}
         <a className="nav-cta"
-          href={`mailto:matbet@matbet.com.pl?subject=Zapytanie o lokal – ${budynekNazwa}`}
+          href="#kontakt"
           style={{
             background: COLORS.red, color: COLORS.white,
             padding: '8px 18px', borderRadius: 20,

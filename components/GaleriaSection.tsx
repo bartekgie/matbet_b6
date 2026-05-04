@@ -122,7 +122,7 @@ export default function GaleriaSection({ galeria }: { galeria: GaleriaItem[] }) 
         }
       `}</style>
 
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
+      <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 32px' }}>
 
         {/* Nagłówek */}
         <div style={{ textAlign: 'center', marginBottom: 48 }}>

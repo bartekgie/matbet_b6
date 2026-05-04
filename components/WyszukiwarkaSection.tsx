@@ -11,15 +11,15 @@ const COLORS = {
 }
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
-  wolne:      { bg: '#e8f5e9', text: '#2e7d32', dot: '#4caf50' },
-  rezerwacja: { bg: '#fff8e1', text: '#f57f17', dot: '#ffc107' },
-  sprzedane:  { bg: '#fce4ec', text: '#c62828', dot: '#ef5350' },
+  wolne:      { bg: '#BBD937', text: '#1B2D4F', dot: '#9ab82e' },
+  rezerwacja: { bg: '#F5C518', text: '#1B2D4F', dot: '#d4a800' },
+  sprzedane:  { bg: '#D93025', text: '#ffffff', dot: '#b32219' },
 }
 
 const fmt = (cena: number) =>
   new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN', maximumFractionDigits: 0 }).format(cena)
 
-const INIT_FILTRY = { pokoje: '', pietro: '', status: '' }
+const INIT_FILTRY = { pokoje: '', pietro: '', status: 'wolne' }
 
 type Sortowanie = 'cena_asc' | 'cena_desc' | 'pow_asc' | 'pow_desc' | 'pietro_asc' | 'pietro_desc' | 'pokoje_asc' | 'pokoje_desc'
 type Widok = 'kafelki' | 'tabela'
@@ -71,6 +71,93 @@ const IkonaTabela = () => (
 // ─── Modal porównywarki ────────────────────────────────────────────────────────
 function Porownywarka({ lokale, onClose }: { lokale: Lokal[]; onClose: () => void }) {
   const n = lokale.length
+
+  const handlePrint = () => {
+    const d = new Intl.DateTimeFormat('pl-PL', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date())
+    const nrs = lokale.map(l => l.nr)
+    const budNazwa = lokale[0]?.budynek?.nazwa ?? 'Budynek B6'
+    const nrsStr = nrs.length >= 2
+      ? nrs.slice(0, -1).join(', ') + ' i ' + nrs[nrs.length - 1]
+      : nrs[0] ?? ''
+    const tytulPDF = `Porównanie lokali ${nrsStr} - ${budNazwa} - Osiedle Nowe Miasto`
+    const logoUrl = window.location.origin + '/Logo%20-%20Matbet%20-%20bia%C5%82e.png'
+    const fmtC = (v: number) => new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN', maximumFractionDigits: 0 }).format(v)
+    const ceny = lokale.map(l => Math.round((l.cenaZaMetr ?? 0) * l.powierzchnia))
+    const pows = lokale.map(l => l.powierzchnia)
+    const bestCena = Math.min(...ceny)
+    const bestPow  = Math.max(...pows)
+    const hl = (v: string, best: boolean) => best
+      ? `<span style="background:#d1fae5;color:#065f46;font-weight:700;border-radius:6px;padding:3px 8px;display:inline-block">${v}</span>`
+      : v
+    const SC: Record<string, { bg: string; c: string; dot: string; label: string }> = {
+      wolne:      { bg: '#BBD937', c: '#1B2D4F', dot: '#9ab82e', label: 'Wolne'      },
+      rezerwacja: { bg: '#F5C518', c: '#1B2D4F', dot: '#d4a800', label: 'Rezerwacja' },
+      sprzedane:  { bg: '#D93025', c: '#ffffff', dot: '#b32219', label: 'Sprzedane'  },
+    }
+    const rows: { label: string; cells: string[] }[] = [
+      { label: 'RZUT',             cells: lokale.map(l => l.thumbRzut
+        ? `<img src="${l.thumbRzut}?w=400&auto=format" style="width:100%;max-width:240px;border-radius:6px;border:1px solid #e5e7eb;display:block;margin:0 auto" />`
+        : '<span style="color:#9ca3af;font-size:12px">Brak rzutu</span>') },
+      { label: 'NR LOKALU',        cells: lokale.map(l => `<strong style="font-size:15px">Lokal ${l.nr}</strong>`) },
+      { label: 'STATUS',           cells: lokale.map(l => { const s = SC[l.status] || SC.wolne; return `<span style="background:${s.bg};color:${s.c};padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600">${s.label}</span>` }) },
+      { label: 'PIĘTRO',          cells: lokale.map(l => l.pietro === 0 ? 'Parter' : `${l.pietro} p.`) },
+      { label: 'POKOJE',           cells: lokale.map(l => `${l.pokoje} ${l.pokoje === 1 ? 'pokój' : 'pokoje'}`) },
+      { label: 'POWIERZCHNIA',     cells: lokale.map((l, i) => hl(`${l.powierzchnia} m²`, pows[i] === bestPow)) },
+      { label: 'CENA',             cells: lokale.map((l, i) => hl(fmtC(ceny[i]), ceny[i] === bestCena)) },
+      { label: 'CENA / M²',       cells: lokale.map(l => `${(l.cenaZaMetr ?? 0).toLocaleString('pl-PL')} zł`) },
+      { label: 'BALKON / OGRÓDEK', cells: lokale.map(l => {
+        if (!l.balkon?.typ || l.balkon.typ === 'brak') return '<span style="color:#9ca3af">–</span>'
+        const t = l.balkon.typ === 'balkon' ? 'Balkon' : 'Ogródek'
+        const p = l.balkon.powierzchnia ? ` · ${l.balkon.powierzchnia} m²` : ''
+        return `<strong style="color:#065f46">${t}${p}</strong>`
+      }) },
+    ]
+    const tdL = 'border:1px solid #e5e7eb;padding:11px 16px;text-align:left;font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:1px;background:#f9fafb;width:140px'
+    const td  = 'border:1px solid #e5e7eb;padding:11px 16px;text-align:center;vertical-align:middle;font-size:14px'
+    const html = `<!DOCTYPE html><html lang="pl"><head><meta charset="UTF-8"><title>${tytulPDF}</title>
+<style>body{font-family:Arial,sans-serif;margin:0;padding:12px;color:#111827}
+h1{color:#1B2D4F;font-size:18px;margin:0 0 2px}
+.sub{font-size:11px;color:#6b7280;margin-bottom:12px}
+table{width:100%;border-collapse:collapse}
+.legend{font-size:10px;color:#6b7280;margin-top:8px;display:flex;align-items:center;gap:6px}
+.ld{width:9px;height:9px;background:#d1fae5;border:1px solid #a7f3d0;border-radius:2px;display:inline-block}
+.date{font-size:10px;color:#9ca3af;margin-top:6px;text-align:right}
+@media print{*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}@page{size:A4 landscape;margin:8mm}html,body{height:100%;overflow:hidden}body{padding:0;zoom:0.72}img{max-height:90px!important;width:auto!important}td,th{padding:6px 10px!important}}</style></head>
+<body>
+<h1>Porównanie lokali</h1>
+<div class="sub">Matbet — Osiedle Nowe Miasto, Słupsk</div>
+<table>
+<thead><tr style="background:#1B2D4F">
+<th style="padding:12px 16px;border:1px solid #2d3f5a;width:140px"></th>
+${lokale.map(l => `<th style="padding:12px 20px;text-align:center;color:#fff;font-size:16px;font-weight:800;border:1px solid #2d3f5a">Lokal ${l.nr}</th>`).join('')}
+</tr></thead>
+<tbody>${rows.map(r => `<tr><td style="${tdL}">${r.label}</td>${r.cells.map(c => `<td style="${td}">${c}</td>`).join('')}</tr>`).join('')}</tbody>
+</table>
+<div class="legend"><span class="ld"></span> Najlepsza wartość w porównaniu</div>
+<div style="background:#1B2D4F;border-radius:8px;margin:12px 0 0;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+  <img src="${logoUrl}" alt="Matbet" style="height:28px;width:auto">
+  <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:flex-end;color:rgba(255,255,255,0.7);font-size:11px">
+    <span style="color:#fff;font-weight:700">MATBET Sp. z o.o.</span>
+    <span style="opacity:0.35">·</span>
+    <span>ul. Poznańska 75, 76-200 Słupsk</span>
+    <span style="opacity:0.35">·</span>
+    <span style="color:#fff">+48 519 326 296</span>
+    <span style="opacity:0.35">·</span>
+    <span>matbet@matbet.com.pl</span>
+    <span style="opacity:0.35">·</span>
+    <span>matbet.com.pl</span>
+  </div>
+</div>
+<div class="date">Wydrukowano: ${d}</div>
+</body></html>`
+    const win = window.open('', '_blank', 'width=1050,height=700')
+    if (!win) return
+    win.document.write(html)
+    win.document.close()
+    win.focus()
+    setTimeout(() => win.print(), 300)
+  }
+
   const best = (vals: number[], preferMin: boolean) => {
     const fn = preferMin ? Math.min : Math.max
     return fn(...vals)
@@ -91,7 +178,7 @@ function Porownywarka({ lokale, onClose }: { lokale: Lokal[]; onClose: () => voi
         const thumb = l.thumb || l.thumbRzut
         return thumb ? (
           <div style={{ position: 'relative', width: '100%', aspectRatio: '4/3', borderRadius: 8, overflow: 'hidden' }}>
-            <Image src={`${thumb}?w=400&fit=crop&auto=format`} alt={`Apartament ${l.nr}`} fill style={{ objectFit: 'cover' }} sizes="33vw" />
+            <Image src={`${thumb}?w=400&fit=crop&auto=format`} alt={`Lokal ${l.nr}`} fill style={{ objectFit: 'cover' }} sizes="33vw" />
           </div>
         ) : (
           <div style={{ aspectRatio: '4/3', background: '#f0f0f0', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb', fontSize: 12 }}>
@@ -100,7 +187,7 @@ function Porownywarka({ lokale, onClose }: { lokale: Lokal[]; onClose: () => voi
         )
       }
     },
-    { label: 'Numer', render: (l) => <strong style={{ fontSize: 16 }}>Apartament {l.nr}</strong> },
+    { label: 'Numer', render: (l) => <strong style={{ fontSize: 16 }}>Lokal {l.nr}</strong> },
     { label: 'Status', render: (l) => {
       const c = STATUS_COLORS[l.status] || STATUS_COLORS.wolne
       return (
@@ -154,7 +241,7 @@ function Porownywarka({ lokale, onClose }: { lokale: Lokal[]; onClose: () => voi
       }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 900, boxShadow: '0 24px 80px rgba(0,0,0,.3)', overflow: 'hidden' }}>
+      <div id="porownywarka-modal-inner" style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 900, boxShadow: '0 24px 80px rgba(0,0,0,.3)', overflow: 'hidden' }}>
         <div style={{ background: COLORS.navy, color: '#fff', padding: '18px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
             <span style={{ fontWeight: 800, fontSize: 16 }}>Porównanie lokali</span>
@@ -162,7 +249,15 @@ function Porownywarka({ lokale, onClose }: { lokale: Lokal[]; onClose: () => voi
               {n} {n === 1 ? 'lokal' : n < 5 ? 'lokale' : 'lokali'}
             </span>
           </div>
-          <button onClick={onClose} style={{ background: 'rgba(255,255,255,.1)', border: 'none', color: '#fff', width: 32, height: 32, borderRadius: '50%', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            <button
+              onClick={handlePrint}
+              style={{ background: 'rgba(255,255,255,.12)', border: 'none', color: '#fff', padding: '6px 16px', borderRadius: 20, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}
+            >
+              Drukuj / PDF
+            </button>
+            <button onClick={onClose} style={{ background: 'rgba(255,255,255,.1)', border: 'none', color: '#fff', width: 32, height: 32, borderRadius: '50%', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+          </div>
         </div>
         <div style={{ padding: '10px 28px', background: '#f7f8fa', borderBottom: '1px solid #eee', fontSize: 12, color: '#888', display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ display: 'inline-block', width: 12, height: 12, background: '#e8f5e9', borderRadius: 3, border: '1px solid #b2dfdb' }} />
@@ -208,12 +303,12 @@ function PasekPorownania({ wybrane, lokale, onToggle, onOpen, onClear }: {
 
   return (
     <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 900, background: COLORS.navy, color: '#fff', boxShadow: '0 -4px 24px rgba(0,0,0,.25)' }}>
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '14px 24px', display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+      <div style={{ maxWidth: 1400, margin: '0 auto', padding: '14px 24px', display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
         <span style={{ fontSize: 12, color: '#8888aa', fontWeight: 700, letterSpacing: 1, whiteSpace: 'nowrap' }}>PORÓWNAJ ({wybrane.length}/3)</span>
         <div style={{ display: 'flex', gap: 10, flex: 1, flexWrap: 'wrap' }}>
           {wybrane_.map(l => (
             <div key={l._id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(255,255,255,.1)', borderRadius: 10, padding: '6px 12px' }}>
-              <span style={{ fontSize: 13, fontWeight: 700 }}>Apartament {l.nr}</span>
+              <span style={{ fontSize: 13, fontWeight: 700 }}>Lokal {l.nr}</span>
               <span style={{ fontSize: 12, color: '#aaa' }}>{l.powierzchnia} m²</span>
               <button onClick={() => onToggle(l._id)} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: 14, lineHeight: 1, padding: 0, marginLeft: 2 }}>✕</button>
             </div>
@@ -258,6 +353,18 @@ export default function WyszukiwarkaSection({ lokale }: { lokale: Lokal[] }) {
     document.body.style.overflow = showModal ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
   }, [showModal])
+
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('porownaj') || '[]') as string[]
+      const valid = saved.filter((id: string) => lokale.some(l => l._id === id))
+      if (valid.length > 0) setPorownaj(valid)
+    } catch {}
+  }, [])
+
+  useEffect(() => {
+    try { localStorage.setItem('porownaj', JSON.stringify(porownaj)) } catch {}
+  }, [porownaj])
 
   const togglePorownaj = (id: string) => {
     setPorownaj(prev => {
@@ -328,12 +435,12 @@ export default function WyszukiwarkaSection({ lokale }: { lokale: Lokal[] }) {
 
       {/* Nagłówek sekcji */}
       <div style={{ textAlign: 'center', paddingBottom: 40, paddingTop: 8 }}>
-        <p style={{ fontSize: 12, letterSpacing: 2, color: '#D93025', fontWeight: 700, textTransform: 'uppercase', marginBottom: 12 }}>DOSTĘPNE LOKALE</p>
+        <p style={{ fontSize: 12, letterSpacing: 2, color: '#D93025', fontWeight: 700, textTransform: 'uppercase', marginBottom: 12 }}>NOWE MIASTO, BUDYNEK B6</p>
         <h2 style={{ fontSize: 36, fontWeight: 800, color: COLORS.navy, marginBottom: 12 }}>Znajdź mieszkanie</h2>
         <p style={{ fontSize: 16, color: '#6B7280' }}>Wybierz lokal dopasowany do Twoich potrzeb</p>
       </div>
 
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px 32px' }}>
+      <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 24px 32px' }}>
 
         {/* FILTRY */}
         <div style={{ background: '#fff', borderRadius: 14, padding: '20px 24px', marginBottom: 24, boxShadow: '0 2px 12px rgba(0,0,0,.06)' }}>
@@ -460,7 +567,7 @@ export default function WyszukiwarkaSection({ lokale }: { lokale: Lokal[] }) {
         {przefiltrowane.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 0', color: '#bbb' }}>Brak lokali spełniających kryteria</div>
         ) : widok === 'kafelki' ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
             {przefiltrowane.map(l => {
               const c = STATUS_COLORS[l.status] || STATUS_COLORS.wolne
               const thumb = l.thumb || l.thumbRzut
@@ -494,12 +601,12 @@ export default function WyszukiwarkaSection({ lokale }: { lokale: Lokal[] }) {
                     }}>
                       {thumb && (
                         <div style={{ position: 'relative', width: '100%', aspectRatio: '4/3' }}>
-                          <Image src={`${thumb}?w=600&fit=crop&auto=format`} alt={`Apartament ${l.nr}`} fill style={{ objectFit: 'cover' }} sizes="(max-width: 768px) 100vw, 33vw" />
+                          <Image src={`${thumb}?w=600&fit=crop&auto=format`} alt={`Lokal ${l.nr}`} fill style={{ objectFit: 'cover' }} sizes="(max-width: 768px) 100vw, 33vw" />
                         </div>
                       )}
                       <div style={{ padding: '16px 20px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-                          <div style={{ fontSize: 15, fontWeight: 700, color: COLORS.navy }}>Apartament {l.nr}</div>
+                          <div style={{ fontSize: 15, fontWeight: 700, color: COLORS.navy }}>Lokal {l.nr}</div>
                           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: c.bg, color: c.text, padding: '3px 10px', borderRadius: 20, fontSize: 12, fontWeight: 600 }}>
                             <span style={{ width: 7, height: 7, borderRadius: '50%', background: c.dot, display: 'inline-block' }} />
                             {l.status}

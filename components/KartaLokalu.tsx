@@ -2,6 +2,8 @@
 
 import Image from 'next/image'
 import Link  from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
 import { Lokal } from '@/lib/types'
 
 const C = {
@@ -21,9 +23,37 @@ const fmt = (n: number) =>
   new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN', maximumFractionDigits: 0 }).format(n)
 
 export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
-  const s        = STATUS[lokal.status] || STATUS.wolne
-  const cena     = Math.round((lokal.cenaZaMetr ?? 0) * lokal.powierzchnia)
+  const router = useRouter()
+  const s      = STATUS[lokal.status] || STATUS.wolne
+  const cena   = Math.round((lokal.cenaZaMetr ?? 0) * lokal.powierzchnia)
   const hasPom = (lokal.pomieszczenia?.length ?? 0) > 0
+
+  const [wPorownaniu, setWPorownaniu] = useState(false)
+  const [maxOsiagniete, setMaxOsiagniete] = useState(false)
+  const [printDate, setPrintDate] = useState('')
+
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('porownaj') || '[]') as string[]
+      setWPorownaniu(saved.includes(lokal._id))
+      setMaxOsiagniete(saved.length >= 3 && !saved.includes(lokal._id))
+    } catch {}
+  }, [lokal._id])
+
+  const togglePorownaj = () => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('porownaj') || '[]') as string[]
+      let updated: string[]
+      if (saved.includes(lokal._id)) {
+        updated = saved.filter((id: string) => id !== lokal._id)
+      } else {
+        updated = saved.length >= 3 ? saved : [...saved, lokal._id]
+      }
+      localStorage.setItem('porownaj', JSON.stringify(updated))
+      setWPorownaniu(updated.includes(lokal._id))
+      setMaxOsiagniete(updated.length >= 3 && !updated.includes(lokal._id))
+    } catch {}
+  }
 
   type Stat = { label: string; val: string; gold?: boolean }
   const statsBasic: Stat[] = [
@@ -45,13 +75,13 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
 
       {/* ── BREADCRUMB (ukryty w druku) ─────────────────────────────────── */}
       <div className="no-print" style={{ background: '#fff', borderBottom: '1px solid #eaecf0' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '8px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link
-            href={lokal.budynek?.slug ? `/budynek/${lokal.budynek.slug}` : '/'}
-            style={{ fontSize: 13, color: C.navy, textDecoration: 'none', fontWeight: 600 }}
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '8px 24px' }}>
+          <button
+            onClick={() => router.back()}
+            style={{ background: 'none', border: 'none', fontSize: 13, color: C.navy, fontWeight: 600, cursor: 'pointer', padding: 0 }}
           >
             ← {lokal.budynek?.nazwa ?? 'Wróć'}
-          </Link>
+          </button>
         </div>
       </div>
 
@@ -65,7 +95,7 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
               {lokal.budynek?.nazwa ?? ''}
             </div>
             <div className="kl-header-title" style={{ fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: 0.3 }}>
-              Apartament {lokal.nr}
+              Lokal {lokal.nr}
             </div>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: s.bg, color: s.text, padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
               <span style={{ width: 5, height: 5, borderRadius: '50%', background: s.dot }} />
@@ -74,7 +104,27 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
           </div>
 
           {/* Pasek parametrów */}
-          <div className="kl-params-container" style={{ background: '#f8f9fb', borderBottom: '1px solid #eaecf0', padding: '0 28px', display: 'flex', justifyContent: 'flex-end' }}>
+          <div className="kl-params-container" style={{ background: '#f8f9fb', borderBottom: '1px solid #eaecf0', padding: '0 28px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            {/* Dodaj do porównania — lewa strona paska */}
+            <button
+              onClick={togglePorownaj}
+              disabled={maxOsiagniete}
+              className="no-print kl-porownaj-btn"
+              title={wPorownaniu ? 'Usuń z porównania' : maxOsiagniete ? 'Można porównać max 3 lokale' : 'Dodaj do porównania'}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                padding: '6px 16px', borderRadius: 20, flexShrink: 0,
+                border: `1.5px solid ${wPorownaniu ? '#4f7cff' : '#ddd'}`,
+                background: wPorownaniu ? '#4f7cff' : '#fff',
+                color: wPorownaniu ? '#fff' : maxOsiagniete ? '#bbb' : C.navy,
+                fontSize: 12, fontWeight: 600, cursor: maxOsiagniete ? 'not-allowed' : 'pointer',
+                opacity: maxOsiagniete ? 0.5 : 1, transition: 'all .15s',
+              }}
+            >
+              {wPorownaniu ? '✓ W porównaniu' : '+ Dodaj do porównania'}
+            </button>
+            {/* Parametry — prawa strona paska */}
+            <div className="kl-params-right" style={{ display: 'flex' }}>
             {/* Podstawowe — desktop: inline, mobile: rząd 1 */}
             <div className="kl-params-basic" style={{ display: 'flex' }}>
               {statsBasic.map(({ label, val }) => (
@@ -101,6 +151,7 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
                 ))}
               </div>
             )}
+            </div>{/* koniec wrappera prawej strony paska */}
           </div>
 
           {/* Rzut B + Legenda */}
@@ -225,25 +276,53 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
             </p>
           </div>
 
-          {/* Spacer dolny */}
-          <div style={{ height: 24 }} />
+          {/* Stopka firmy — widoczna też w druku */}
+          <div className="kl-firm-footer" style={{
+            background: C.navy, borderRadius: 8,
+            margin: '16px 28px 16px', padding: '14px 16px', display: 'flex',
+            alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap',
+          }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/Logo%20-%20Matbet%20-%20bia%C5%82e.png" alt="Matbet" style={{ height: 30, width: 'auto', flexShrink: 0 }} />
+            <div className="kl-firm-footer-info" style={{
+              display: 'flex', gap: 5, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end',
+              color: 'rgba(255,255,255,0.7)', fontSize: 11,
+            }}>
+              <span style={{ color: '#fff', fontWeight: 700 }}>MATBET Sp. z o.o.</span>
+              <span style={{ opacity: 0.35 }}>·</span>
+              <span>ul. Poznańska 75, 76-200 Słupsk</span>
+              <span style={{ opacity: 0.35 }}>·</span>
+              <span style={{ color: '#fff' }}>+48 519 326 296</span>
+              <span style={{ opacity: 0.35 }}>·</span>
+              <span>matbet@matbet.com.pl</span>
+              <span style={{ opacity: 0.35 }}>·</span>
+              <span>matbet.com.pl</span>
+            </div>
+          </div>
+
+          {/* Data wydruku — widoczna tylko w druku */}
+          {printDate && (
+            <div className="kl-print-date" style={{ display: 'none', margin: '0 28px 8px', padding: '6px 0', borderTop: '1px solid rgba(27,45,79,0.15)', fontSize: 10, color: '#9ca3af', textAlign: 'right' }}>
+              Data wydruku: {printDate}
+            </div>
+          )}
 
         </div>
 
         {/* Przyciski akcji (ukryte w druku) */}
         <div className="no-print kl-btns" style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 20, flexWrap: 'wrap' }}>
-          <Link
-            href={lokal.budynek?.slug ? `/budynek/${lokal.budynek.slug}` : '/'}
+          <button
+            onClick={() => router.back()}
             className="kl-btn"
             style={{
               padding: '12px 32px', borderRadius: 10,
               background: '#f3f4f6', color: C.navy,
-              textDecoration: 'none', fontWeight: 700, fontSize: 14,
-              textAlign: 'center',
+              border: 'none', fontWeight: 700, fontSize: 14,
+              cursor: 'pointer', textAlign: 'center',
             }}
           >
             ← Wróć
-          </Link>
+          </button>
           <a
             href="mailto:biuro@matbet.pl"
             className="kl-btn"
@@ -257,7 +336,14 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
             Skontaktuj się
           </a>
           <button
-            onClick={() => window.print()}
+            onClick={() => {
+              const d = new Intl.DateTimeFormat('pl-PL', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date())
+              setPrintDate(d)
+              const prev = document.title
+              document.title = `Lokal ${lokal.nr} - Osiedle Nowe Miasto - Budynek B6`
+              window.addEventListener('afterprint', () => { document.title = prev }, { once: true })
+              setTimeout(() => window.print(), 50)
+            }}
             className="kl-btn"
             style={{
               padding: '12px 32px', borderRadius: 10,
@@ -278,12 +364,16 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
           nav        { display: none !important; }
           footer     { display: none !important; }
           main       { padding-top: 0 !important; background: #fff !important; }
+          body       { zoom: 0.72; margin: 0 !important; }
+          .kl-outer  { max-width: 100% !important; margin: 0 !important; padding: 0 4px !important; }
           #karta-print {
             box-shadow: none !important;
             border-radius: 0 !important;
             margin: 0 !important;
+            page-break-inside: avoid;
           }
-          @page { margin: 10mm; size: A4 portrait; }
+          .kl-print-date { display: block !important; }
+          @page { margin: 8mm; size: A4 landscape; }
         }
         @media (min-width: 769px) {
           .kl-has-pom .kl-rzut-col { display: flex; flex-direction: column; }
@@ -299,11 +389,17 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
           .kl-btns { flex-direction: column !important; align-items: stretch !important; }
           .kl-btn { width: 100% !important; box-sizing: border-box !important; text-align: center !important; justify-content: center !important; }
           .kl-param-item { padding: 10px 10px !important; }
-          .kl-params-container { flex-direction: column !important; padding: 0 14px !important; }
-          .kl-params-basic { width: 100%; }
-          .kl-params-basic .kl-param-item { flex: 1; }
+          .kl-params-container { flex-direction: column !important; padding: 0 14px !important; align-items: stretch !important; }
+          .kl-porownaj-btn { width: 100% !important; justify-content: center !important; margin: 10px 0 !important; }
+          .kl-params-right { flex-direction: column !important; width: 100% !important; }
+          .kl-params-basic { width: 100% !important; }
+          .kl-params-basic .kl-param-item { flex: 1 1 0 !important; flex-shrink: 1 !important; min-width: 0 !important; }
           .kl-params-basic .kl-param-item:last-child { border-right: none !important; }
-          .kl-params-pricing { border-top: 1px solid #dde1e7; justify-content: flex-end; }
+          .kl-params-pricing { border-top: 1px solid #dde1e7 !important; width: 100% !important; }
+          .kl-params-pricing .kl-param-item { flex: 1 1 0 !important; flex-shrink: 1 !important; min-width: 0 !important; border-right: none !important; }
+          .kl-params-pricing .kl-param-item:first-child { border-right: 1px solid #dde1e7 !important; }
+          .kl-firm-footer { flex-direction: column !important; align-items: center !important; text-align: center !important; margin: 12px 14px 14px !important; }
+          .kl-firm-footer-info { justify-content: center !important; }
         }
       `}</style>
     </main>

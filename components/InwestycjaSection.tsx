@@ -169,7 +169,7 @@ export default function InwestycjaSection({ budynek }: { budynek: Budynek }) {
   return (
     <section id="inwestycja" style={{ background: '#fff', padding: '80px 0 0 0' }}>
 
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px 64px' }}>
+      <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 32px 64px' }}>
 
         {/* Tekst — zawsze widoczny, bez animacji blokującej */}
         <div style={{ textAlign: 'center', marginBottom: 48, maxWidth: 760, margin: '0 auto 48px' }}>
@@ -203,24 +203,22 @@ export default function InwestycjaSection({ budynek }: { budynek: Budynek }) {
 
       </div>
 
-      {/* Stats bar */}
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
-        <div className="stats-box" style={{
-          background: COLORS.navy,
-          padding: '48px 32px',
-          display: 'flex',
-          justifyContent: 'space-around',
-          flexWrap: 'wrap',
-          gap: 32,
-        }}>
-          {STATYSTYKI.map(s => (
-            <CountUp
-              key={s.label}
-              target={parseInt(s.val.replace(/\s/g, ''), 10)}
-              label={s.label}
-            />
-          ))}
-        </div>
+      {/* Stats bar — full width */}
+      <div className="stats-box" style={{
+        background: COLORS.navy,
+        padding: '48px 32px',
+        display: 'flex',
+        justifyContent: 'space-around',
+        flexWrap: 'wrap',
+        gap: 32,
+      }}>
+        {STATYSTYKI.map(s => (
+          <CountUp
+            key={s.label}
+            target={parseInt(s.val.replace(/\s/g, ''), 10)}
+            label={s.label}
+          />
+        ))}
       </div>
 
       <style>{`

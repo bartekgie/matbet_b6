@@ -7,6 +7,7 @@ import WyszukiwarkaSection from '@/components/WyszukiwarkaSection'
 import InwestycjaSection   from '@/components/InwestycjaSection'
 import GaleriaSection      from '@/components/GaleriaSection'
 import MapaSection         from '@/components/MapaSection'
+import FormularzSection    from '@/components/FormularzSection'
 import Footer              from '@/components/Footer'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -36,6 +37,7 @@ export default async function BudynekPage({ params }: { params: Promise<{ slug: 
         <InwestycjaSection budynek={budynek} />
         <GaleriaSection galeria={budynek.galeria ?? []} />
         <MapaSection lat={budynek.lat} lng={budynek.lng} adres={budynek.adres} />
+        <FormularzSection />
       </main>
       <Footer />
     </>
