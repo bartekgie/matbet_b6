@@ -12,14 +12,24 @@ const client = createClient({
 const builder = imageUrlBuilder(client)
 const urlFor = (source: any) => builder.image(source)
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://example.com'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.matbet.com.pl'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const lokale = await client.fetch(`*[_type == "lokal"]{
-    _id, _updatedAt,
-    zdjecia[] { asset->{ _id, url, metadata { dimensions } }, alt },
-    rzut { asset->{ _id, url, metadata { dimensions } }, alt }
-  }`)
+  const [lokale, budynki] = await Promise.all([
+    client.fetch(`*[_type == "lokal"]{
+      _id, _updatedAt,
+      zdjecia[] { asset->{ _id, url, metadata { dimensions } }, alt },
+      rzut { asset->{ _id, url, metadata { dimensions } }, alt }
+    }`),
+    client.fetch(`*[_type == "budynek"]{ _updatedAt, "slug": slug.current }`),
+  ])
+
+  const budynkiEntries: MetadataRoute.Sitemap = budynki.map((b: any) => ({
+    url: `${SITE_URL}/budynek/${b.slug}`,
+    lastModified: b._updatedAt ? new Date(b._updatedAt) : new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.9,
+  }))
 
   const lokaleEntries: MetadataRoute.Sitemap = lokale.map((lokal: any) => {
     const allPhotos = [
@@ -32,17 +42,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: lokal._updatedAt ? new Date(lokal._updatedAt) : new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.8,
-      // image sitemap extension
       images: allPhotos.map((foto: any) => urlFor(foto).width(1200).url()),
     }
   })
 
   return [
-    {
-      url: SITE_URL,
-      changeFrequency: 'daily',
-      priority: 1,
-    },
+    { url: SITE_URL, changeFrequency: 'daily', priority: 1 },
+    ...budynkiEntries,
     ...lokaleEntries,
   ]
 }

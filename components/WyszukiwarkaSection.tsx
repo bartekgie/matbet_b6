@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useLayoutEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -122,7 +122,7 @@ table{width:100%;border-collapse:collapse}
 .legend{font-size:10px;color:#6b7280;margin-top:8px;display:flex;align-items:center;gap:6px}
 .ld{width:9px;height:9px;background:#d1fae5;border:1px solid #a7f3d0;border-radius:2px;display:inline-block}
 .date{font-size:10px;color:#9ca3af;margin-top:6px;text-align:right}
-@media print{*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}@page{size:A4 landscape;margin:8mm}html,body{height:100%;overflow:hidden}body{padding:0;zoom:0.72}img{max-height:90px!important;width:auto!important}td,th{padding:6px 10px!important}}</style></head>
+@media print{*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}@page{size:A4 portrait;margin:8mm}html,body{height:100%;overflow:hidden}body{padding:0;zoom:0.72}img{max-height:90px!important;width:auto!important}td,th{padding:6px 10px!important}}</style></head>
 <body>
 <h1>Porównanie lokali</h1>
 <div class="sub">Matbet — Osiedle Nowe Miasto, Słupsk</div>
@@ -387,6 +387,29 @@ export default function WyszukiwarkaSection({ lokale }: { lokale: Lokal[] }) {
     setPowRange([powBounds.min, powBounds.max])
   }, [powBounds.min, powBounds.max])
 
+  // Przywróć stan filtrów i pozycję scrolla po powrocie z karty lokalu
+  useLayoutEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('matbet_wyszukiwarka')
+      if (!raw) return
+      const saved = JSON.parse(raw)
+      sessionStorage.removeItem('matbet_wyszukiwarka')
+      setFiltry(saved.filtry)
+      setSortowanie(saved.sortowanie)
+      setWidok(saved.widok)
+      if (saved.powRange) setPowRange(saved.powRange)
+      requestAnimationFrame(() => window.scrollTo({ top: saved.scrollY, behavior: 'instant' }))
+    } catch {}
+  }, [])
+
+  const saveState = () => {
+    try {
+      sessionStorage.setItem('matbet_wyszukiwarka', JSON.stringify({
+        filtry, sortowanie, widok, powRange, scrollY: window.scrollY,
+      }))
+    } catch {}
+  }
+
   const powAktywny = powRange[0] > powBounds.min || powRange[1] < powBounds.max
 
   const select = (key: string, val: string) =>
@@ -592,7 +615,7 @@ export default function WyszukiwarkaSection({ lokale }: { lokale: Lokal[] }) {
                   >
                     {wPorownaniu ? '✓' : '+'}
                   </button>
-                  <Link href={`/lokal/${l._id}`} style={{ textDecoration: 'none' }}>
+                  <Link href={`/lokal/${l._id}`} onClick={saveState} style={{ textDecoration: 'none' }}>
                     <div className="lokal-card" style={{
                       background: '#fff', borderRadius: 14, overflow: 'hidden',
                       boxShadow: wPorownaniu ? '0 0 0 2px #4f7cff, 0 4px 16px rgba(79,124,255,.2)' : '0 2px 12px rgba(0,0,0,.06)',
@@ -709,7 +732,7 @@ export default function WyszukiwarkaSection({ lokale }: { lokale: Lokal[] }) {
                         </span>
                       </td>
                       <td style={{ padding: '12px 16px' }}>
-                        <Link href={`/lokal/${l._id}`} style={{ fontSize: 12, fontWeight: 600, color: COLORS.navy, textDecoration: 'none', borderBottom: `1px solid ${COLORS.navy}`, whiteSpace: 'nowrap' }}>
+                        <Link href={`/lokal/${l._id}`} onClick={saveState} style={{ fontSize: 12, fontWeight: 600, color: COLORS.navy, textDecoration: 'none', borderBottom: `1px solid ${COLORS.navy}`, whiteSpace: 'nowrap' }}>
                           Zobacz →
                         </Link>
                       </td>

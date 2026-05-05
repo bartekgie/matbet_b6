@@ -14,10 +14,31 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const budynek = await client.fetch(BUDYNEK_QUERY, { slug })
   if (!budynek) return {}
+
+  const title = `${budynek.nazwa} – Osiedle Nowe Miasto Słupsk`
+  const description = `${budynek.nazwa} to nowoczesna inwestycja dewelopera Matbet w Słupsku. ${budynek.liczbaLokali ? `${budynek.liczbaLokali} lokali` : 'Lokale'} na sprzedaż w Osiedlu Nowe Miasto. ${budynek.adres ?? ''}`.trim()
+  const url = `https://www.matbet.com.pl/budynek/${slug}`
+
   return {
-    title: `${budynek.nazwa} — Osiedle Nowe Miasto Słupsk | Matbet`,
-    description: `${budynek.nazwa} w ramach Osiedla Nowe Miasto w Słupsku. ${budynek.liczbaLokali} lokali na sprzedaż. Matbet Deweloper.`,
-    openGraph: { images: [budynek.heroUrl] },
+    title,
+    description,
+    keywords: [`${budynek.nazwa} Słupsk`, 'mieszkania Słupsk', 'Osiedle Nowe Miasto Słupsk', 'Matbet deweloper', 'nowe mieszkania Słupsk'],
+    alternates: { canonical: url },
+    openGraph: {
+      title,
+      description,
+      url,
+      type: 'website',
+      locale: 'pl_PL',
+      siteName: 'Matbet Deweloper',
+      images: budynek.heroUrl ? [{ url: budynek.heroUrl, width: 1200, height: 630, alt: budynek.nazwa }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: budynek.heroUrl ? [budynek.heroUrl] : [],
+    },
   }
 }
 

@@ -22,6 +22,166 @@ const STATUS: Record<string, { bg: string; text: string; dot: string; label: str
 const fmt = (n: number) =>
   new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN', maximumFractionDigits: 0 }).format(n)
 
+// ─── Stałe zgód (tożsame z FormularzSection) ────────────────────────────────
+const ZGODA_1 = `Mam świadomość prawa dostępu do treści moich danych i ich poprawiania. Mam świadomość, iż w każdej chwili mogę wystąpić o zaprzestanie przetwarzania podanych przeze mnie danych osobowych w celach marketingowych, co skutkować będzie usunięciem danych z baz wykorzystywanych w celach marketingowych. Wyrażam zgodę na prowadzenie korespondencji drogą elektroniczną, zgodnie z ustawą o świadczeniu usług drogą elektroniczną (tekst jedn. Dz. U. z 2016 r. poz. 1030, 1579), a także drogą telefoniczną.`
+const ZGODA_2 = `Wyrażam zgodę na prowadzenie korespondencji drogą elektroniczną, zgodnie z ustawą o świadczeniu usług drogą elektroniczną (tekst jedn. Dz. U. z 2016 r. poz. 1030, 1579), a także drogą telefoniczną.`
+const KLAUZULA = `Dane osobowe przetwarzane są zgodnie z art. 23 ust.1 pkt. 5 ustawy o ochronie danych osobowych (Dz. U. z 2015 r. poz. 2135, z późn. zm.) przez administratora danych, MATBET spółka z o.o. z siedzibą ul. Poznańska 75, 76-200 Słupsk, w celu przedstawienia oferty handlowej, a także w celach marketingowych. Zebrane dane osobowe są udostępniane współpracującym z MATBET spółka z o.o. podmiotom. Podanie danych osobowych MATBET spółce z o.o. jest dobrowolne, poprzez zaakceptowanie niżej wymienionych oświadczeń.`
+
+function ModalCheckbox({ checked, onChange, text, error, onClear }: {
+  checked: boolean; onChange: (v: boolean) => void; text: string; error?: string; onClear: () => void
+}) {
+  return (
+    <div style={{ marginBottom: 14 }}>
+      <label style={{ display: 'flex', gap: 10, cursor: 'pointer', alignItems: 'flex-start' }}>
+        <input type="checkbox" checked={checked}
+          onChange={e => { onChange(e.target.checked); if (e.target.checked) onClear() }}
+          style={{ marginTop: 3, flexShrink: 0, accentColor: C.navy, width: 16, height: 16, cursor: 'pointer' }}
+        />
+        <span style={{ fontSize: 11, color: '#374151', lineHeight: 1.6 }}>{text}</span>
+      </label>
+      {error && <p style={{ fontSize: 11, color: C.red, marginTop: 4, marginLeft: 26 }}>{error}</p>}
+    </div>
+  )
+}
+
+function KontaktModal({ lokal, onClose }: { lokal: Lokal; onClose: () => void }) {
+  const [form, setForm] = useState({
+    imie: '', nazwisko: '', email: '', telefon: '',
+    zapytanie: `Jestem zainteresowany/a Lokalem ${lokal.nr} – ${lokal.budynek?.nazwa ?? 'Osiedle Nowe Miasto'}.\n`,
+  })
+  const [zgoda1, setZgoda1] = useState(false)
+  const [zgoda2, setZgoda2] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'error'>('idle')
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [onClose])
+
+  const set = (key: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm(f => ({ ...f, [key]: e.target.value }))
+    setErrors(prev => { const n = { ...prev }; delete n[key]; return n })
+  }
+
+  const validate = () => {
+    const e: Record<string, string> = {}
+    if (!form.imie.trim())     e.imie     = 'Pole wymagane'
+    if (!form.nazwisko.trim()) e.nazwisko = 'Pole wymagane'
+    if (!form.email.trim() && !form.telefon.trim()) {
+      e.email = 'Podaj e-mail lub numer telefonu'
+      e.telefon = 'Podaj e-mail lub numer telefonu'
+    }
+    if (!form.zapytanie.trim()) e.zapytanie = 'Pole wymagane'
+    if (!zgoda1) e.zgoda1 = 'Zgoda wymagana'
+    if (!zgoda2) e.zgoda2 = 'Zgoda wymagana'
+    return e
+  }
+
+  const handleSubmit = async (ev: React.FormEvent) => {
+    ev.preventDefault()
+    const errs = validate()
+    if (Object.keys(errs).length > 0) { setErrors(errs); return }
+    setErrors({})
+    setStatus('sending')
+    try {
+      const res = await fetch('/api/kontakt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, lokalNr: lokal.nr, budynekNazwa: lokal.budynek?.nazwa }),
+      })
+      setStatus(res.ok ? 'ok' : 'error')
+    } catch { setStatus('error') }
+  }
+
+  const inp = (err?: string) => ({
+    width: '100%', boxSizing: 'border-box' as const, padding: '11px 13px', borderRadius: 8,
+    border: `1px solid ${err ? C.red : '#dde1e7'}`, fontSize: 14, color: C.navy,
+    background: '#fff', outline: 'none', fontFamily: 'inherit',
+  })
+  const lbl = { fontSize: 12, fontWeight: 700, color: C.navy, letterSpacing: 0.5, marginBottom: 6, display: 'block', textTransform: 'uppercase' as const }
+  const errS = { fontSize: 11, color: C.red, marginTop: 4, display: 'block' }
+
+  return (
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px 16px', overflowY: 'auto' }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: '#fff', borderRadius: 16, width: '100%', maxWidth: 580, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 24px 80px rgba(0,0,0,0.3)' }}>
+
+        {/* Header */}
+        <div style={{ background: C.navy, borderRadius: '16px 16px 0 0', padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.6)', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 4 }}>Zapytaj o</div>
+            <div style={{ fontSize: 20, fontWeight: 800, color: '#fff' }}>Lokal {lokal.nr}</div>
+          </div>
+          <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', width: 36, height: 36, borderRadius: '50%', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+        </div>
+
+        {/* Formularz */}
+        <form onSubmit={handleSubmit} noValidate style={{ padding: '28px 28px 24px' }}>
+          <div className="km-grid">
+            <div>
+              <label style={lbl}>Imię *</label>
+              <input type="text" value={form.imie} onChange={set('imie')} placeholder="Jan" style={inp(errors.imie)} onFocus={e => { e.currentTarget.style.borderColor = C.navy }} onBlur={e => { e.currentTarget.style.borderColor = errors.imie ? C.red : '#dde1e7' }} />
+              {errors.imie && <span style={errS}>{errors.imie}</span>}
+            </div>
+            <div>
+              <label style={lbl}>Nazwisko *</label>
+              <input type="text" value={form.nazwisko} onChange={set('nazwisko')} placeholder="Kowalski" style={inp(errors.nazwisko)} onFocus={e => { e.currentTarget.style.borderColor = C.navy }} onBlur={e => { e.currentTarget.style.borderColor = errors.nazwisko ? C.red : '#dde1e7' }} />
+              {errors.nazwisko && <span style={errS}>{errors.nazwisko}</span>}
+            </div>
+          </div>
+
+          <p style={{ fontSize: 12, color: '#6b7280', marginBottom: 10 }}>Podaj e-mail lub numer telefonu — wystarczy jedno pole *</p>
+          <div className="km-grid">
+            <div>
+              <label style={lbl}>E-mail</label>
+              <input type="email" value={form.email} onChange={set('email')} placeholder="jan@email.pl" style={inp(errors.email)} onFocus={e => { e.currentTarget.style.borderColor = C.navy }} onBlur={e => { e.currentTarget.style.borderColor = errors.email ? C.red : '#dde1e7' }} />
+              {errors.email && <span style={errS}>{errors.email}</span>}
+            </div>
+            <div>
+              <label style={lbl}>Telefon</label>
+              <input type="tel" value={form.telefon} onChange={set('telefon')} placeholder="600 100 200" style={inp(errors.telefon)} onFocus={e => { e.currentTarget.style.borderColor = C.navy }} onBlur={e => { e.currentTarget.style.borderColor = errors.telefon ? C.red : '#dde1e7' }} />
+              {errors.telefon && <span style={errS}>{errors.telefon}</span>}
+            </div>
+          </div>
+
+          <div style={{ marginBottom: 28 }}>
+            <label style={lbl}>Zapytanie *</label>
+            <textarea value={form.zapytanie} onChange={set('zapytanie')} rows={4} style={{ ...inp(errors.zapytanie), resize: 'vertical', minHeight: 100 }} onFocus={e => { e.currentTarget.style.borderColor = C.navy }} onBlur={e => { e.currentTarget.style.borderColor = errors.zapytanie ? C.red : '#dde1e7' }} />
+            {errors.zapytanie && <span style={errS}>{errors.zapytanie}</span>}
+          </div>
+
+          <div style={{ borderTop: '1px solid #dde1e7', paddingTop: 20, marginBottom: 8 }}>
+            <ModalCheckbox checked={zgoda1} onChange={setZgoda1} text={ZGODA_1} error={errors.zgoda1} onClear={() => setErrors(p => { const n = {...p}; delete n.zgoda1; return n })} />
+            <ModalCheckbox checked={zgoda2} onChange={setZgoda2} text={ZGODA_2} error={errors.zgoda2} onClear={() => setErrors(p => { const n = {...p}; delete n.zgoda2; return n })} />
+          </div>
+
+          <p style={{ fontSize: 11, color: '#6b7280', lineHeight: 1.6, marginBottom: 24, padding: '10px 12px', background: '#f5f7fa', borderRadius: 8, border: '1px solid #dde1e7' }}>{KLAUZULA}</p>
+
+          {status === 'ok' ? (
+            <div style={{ textAlign: 'center', padding: '20px', background: '#d1fae5', borderRadius: 10, color: '#065f46', fontWeight: 700 }}>
+              Wiadomość wysłana! Odezwiemy się wkrótce.
+            </div>
+          ) : (
+            <button type="submit" disabled={status === 'sending'} style={{ width: '100%', padding: '14px 24px', background: status === 'sending' ? '#8a9ab5' : C.navy, color: '#fff', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 700, cursor: status === 'sending' ? 'default' : 'pointer', fontFamily: 'inherit' }}>
+              {status === 'sending' ? 'Wysyłanie...' : 'Wyślij zapytanie'}
+            </button>
+          )}
+          {status === 'error' && (
+            <p style={{ color: C.red, fontSize: 13, textAlign: 'center', marginTop: 12 }}>
+              Wystąpił błąd podczas wysyłania. Spróbuj ponownie lub zadzwoń do nas.
+            </p>
+          )}
+        </form>
+      </div>
+    </div>
+  )
+}
+
 export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
   const router = useRouter()
   const s      = STATUS[lokal.status] || STATUS.wolne
@@ -31,6 +191,7 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
   const [wPorownaniu, setWPorownaniu] = useState(false)
   const [maxOsiagniete, setMaxOsiagniete] = useState(false)
   const [printDate, setPrintDate] = useState('')
+  const [showKontakt, setShowKontakt] = useState(false)
 
   useEffect(() => {
     try {
@@ -73,11 +234,13 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
   return (
     <main style={{ background: C.bg, fontFamily: 'sans-serif', paddingTop: 80 }}>
 
+      {showKontakt && <KontaktModal lokal={lokal} onClose={() => setShowKontakt(false)} />}
+
       {/* ── BREADCRUMB (ukryty w druku) ─────────────────────────────────── */}
       <div className="no-print" style={{ background: '#fff', borderBottom: '1px solid #eaecf0' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '8px 24px' }}>
           <button
-            onClick={() => router.back()}
+            onClick={() => router.push(`/budynek/${lokal.budynek?.slug ?? ''}`, { scroll: false })}
             style={{ background: 'none', border: 'none', fontSize: 13, color: C.navy, fontWeight: 600, cursor: 'pointer', padding: 0 }}
           >
             ← {lokal.budynek?.nazwa ?? 'Wróć'}
@@ -242,23 +405,11 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
                 }}>
                   <div style={{ fontSize: 9, color: '#9ca3af', letterSpacing: 1.2, textTransform: 'uppercase', fontWeight: 700, marginBottom: 2 }}>Oznaczenia</div>
                   {[
-                    {
-                      label: 'Ściany nośne',
-                      swatch: {
-                        background: 'repeating-linear-gradient(45deg, #1B2D4F 0px, #1B2D4F 3px, #4a6080 3px, #4a6080 6px)',
-                        border: '1px solid #1B2D4F',
-                      },
-                    },
-                    {
-                      label: 'Ściany działowe',
-                      swatch: {
-                        background: '#e5e7eb',
-                        border: '1px solid #9ca3af',
-                      },
-                    },
-                  ].map(({ label, swatch }) => (
+                    { label: 'Ściany nośne',    src: '/sciany nosne.png' },
+                    { label: 'Ściany działowe', src: '/sciany dzialowe.png' },
+                  ].map(({ label, src }) => (
                     <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <div style={{ width: 32, height: 16, borderRadius: 3, flexShrink: 0, ...swatch }} />
+                      <img src={src} alt={label} style={{ width: 32, height: 16, objectFit: 'cover', borderRadius: 3, flexShrink: 0 }} />
                       <span style={{ fontSize: 11, color: '#374151', fontWeight: 500 }}>{label}</span>
                     </div>
                   ))}
@@ -312,7 +463,7 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
         {/* Przyciski akcji (ukryte w druku) */}
         <div className="no-print kl-btns" style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 20, flexWrap: 'wrap' }}>
           <button
-            onClick={() => router.back()}
+            onClick={() => router.push(`/budynek/${lokal.budynek?.slug ?? ''}`, { scroll: false })}
             className="kl-btn"
             style={{
               padding: '12px 32px', borderRadius: 10,
@@ -323,18 +474,18 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
           >
             ← Wróć
           </button>
-          <a
-            href="mailto:biuro@matbet.pl"
+          <button
+            onClick={() => setShowKontakt(true)}
             className="kl-btn"
             style={{
               display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
               padding: '12px 32px', borderRadius: 10,
-              background: C.navy, color: '#fff',
-              textDecoration: 'none', fontWeight: 700, fontSize: 14,
+              background: C.red, color: '#fff',
+              border: 'none', fontWeight: 700, fontSize: 14, cursor: 'pointer',
             }}
           >
             Skontaktuj się
-          </a>
+          </button>
           <button
             onClick={() => {
               const d = new Intl.DateTimeFormat('pl-PL', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date())
@@ -358,6 +509,8 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
       </div>
 
       <style>{`
+        .km-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+        @media (max-width: 500px) { .km-grid { grid-template-columns: 1fr !important; } }
         @media print {
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
           .no-print { display: none !important; }
@@ -373,7 +526,7 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
             page-break-inside: avoid;
           }
           .kl-print-date { display: block !important; }
-          @page { margin: 8mm; size: A4 landscape; }
+          @page { margin: 8mm; size: A4 portrait; }
         }
         @media (min-width: 769px) {
           .kl-has-pom .kl-rzut-col { display: flex; flex-direction: column; }
