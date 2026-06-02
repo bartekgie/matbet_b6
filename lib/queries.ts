@@ -3,14 +3,15 @@ export const BUDYNEK_QUERY = `
   *[_type == "budynek" && slug.current == $slug][0]{
     _id, nazwa, podtytul, slug,
     opis, adres, lat, lng,
-    liczbaLokali, kondygnacje, cechy,
+    liczbaLokali, kondygnacje,
     "heroUrl": heroZdjecie.asset->url,
     "heroLqip": heroZdjecie.asset->metadata.lqip,
     "galeria": galeria[]{
       "url": asset->url,
       "lqip": asset->metadata.lqip,
       alt
-    }
+    },
+    "cechy": cechy[]{ tytul, opis, "ikonaUrl": ikona.asset->url }
   }
 `
 

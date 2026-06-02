@@ -6,8 +6,8 @@ import { useState, useEffect } from 'react'
 
 const COLORS = {
   navy:  '#1B2D4F',
-  red:   '#D93025',
-  gold:  '#C9973A',
+  gold:  '#D5A23F',
+  text:  '#404040',
   white: '#FFFFFF',
 }
 
@@ -71,13 +71,10 @@ export default function HeroSection({ budynek, wolneLokali }: { budynek: Budynek
         <div style={{ position: 'absolute', inset: 0, background: COLORS.navy }} />
       )}
 
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        background: 'linear-gradient(to bottom, rgba(27,45,79,0.5) 0%, rgba(27,45,79,0.75) 100%)',
-      }} />
+      {/* Overlay dla czytelności tekstu */}
+      <div className="hero-overlay" style={{ position: 'absolute', inset: 0 }} />
 
-      <div style={{
+      <div className="hero-content" style={{
         position: 'absolute',
         top: '50%',
         left: 0,
@@ -88,16 +85,16 @@ export default function HeroSection({ budynek, wolneLokali }: { budynek: Budynek
         maxWidth: 900,
         margin: '0 auto',
       }}>
-        <p style={{ fontSize: 12, letterSpacing: 3, color: 'rgba(255,255,255,0.7)', marginBottom: 16, textTransform: 'uppercase' }}>
+        <p className="hero-location" style={{ letterSpacing: 3, color: COLORS.text, marginBottom: 16, textTransform: 'uppercase', opacity: 0.7 }}>
           Osiedle Nowe Miasto • Słupsk
         </p>
 
-        <h1 style={{ fontSize: 'clamp(40px, 8vw, 64px)', fontWeight: 800, color: COLORS.white, lineHeight: 1.1, marginBottom: 16 }}>
+        <h1 className="hero-title" style={{ fontWeight: 800, color: COLORS.text, lineHeight: 1.1, marginBottom: 16 }}>
           {budynek.nazwa}
         </h1>
 
         {budynek.podtytul && (
-          <p style={{ fontSize: 18, color: 'rgba(255,255,255,0.8)', marginBottom: 40 }}>
+          <p className="hero-subtitle" style={{ color: COLORS.text, opacity: 0.75, marginBottom: 40 }}>
             {budynek.podtytul}
           </p>
         )}
@@ -108,7 +105,7 @@ export default function HeroSection({ budynek, wolneLokali }: { budynek: Budynek
               <div className="hero-stat-num" style={{ fontWeight: 800, color: COLORS.gold, lineHeight: 1 }}>
                 {num != null ? <HeroCountUp target={num} delay={delay} /> : String(fallback)}
               </div>
-              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 6 }}>
+              <div className="hero-stat-label" style={{ color: COLORS.text, opacity: 0.65, marginTop: 6 }}>
                 {label}
               </div>
             </div>
@@ -118,13 +115,12 @@ export default function HeroSection({ budynek, wolneLokali }: { budynek: Budynek
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center' }}>
           <a
             href="#mieszkania"
+            className="hero-cta-btn"
             style={{
-              background: COLORS.red,
+              background: COLORS.gold,
               color: COLORS.white,
-              padding: '14px 32px',
               borderRadius: 25,
               fontWeight: 700,
-              fontSize: 15,
               textDecoration: 'none',
               display: 'inline-block',
             }}
@@ -136,15 +132,34 @@ export default function HeroSection({ budynek, wolneLokali }: { budynek: Budynek
 
       <div style={{ position: 'absolute', bottom: 32, left: '50%', transform: 'translateX(-50%)', animation: 'bounce 1.5s infinite' }}>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path d="M12 5v14M5 12l7 7 7-7" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M12 5v14M5 12l7 7 7-7" stroke={COLORS.text} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </div>
 
       <style>{`
-        .hero-stat-num { font-size: 80px; }
+        .hero-overlay  { background: linear-gradient(to bottom, rgba(244,243,239,0.35) 0%, rgba(244,243,239,0.55) 50%, rgba(244,243,239,0.35) 100%); }
+        .hero-location { font-size: 12px; }
+        .hero-title    { font-size: clamp(40px, 8vw, 64px); }
+        .hero-subtitle { font-size: 18px; }
+        .hero-stat-num { font-size: 90px; }
+        .hero-stat-label { font-size: 12px; }
+        .hero-cta-btn  { font-size: 15px; padding: 14px 32px; transition: background 0.15s, transform 0.15s, box-shadow 0.15s; }
+        .hero-cta-btn:hover { background: #C4922A !important; transform: translateY(-2px); box-shadow: 0 6px 18px rgba(213,162,63,0.35); }
+
+        @media (min-width: 769px) {
+          .hero-overlay  { background: linear-gradient(to bottom, rgba(244,243,239,0.45) 0%, rgba(244,243,239,0.82) 50%, rgba(244,243,239,0.45) 100%); }
+          .hero-location { font-size: 14px; }
+          .hero-title    { font-size: clamp(48px, 9.6vw, 77px); }
+          .hero-subtitle { font-size: 22px; }
+          .hero-stat-num { font-size: 108px; }
+          .hero-stat-label { font-size: 14px; }
+          .hero-cta-btn  { font-size: 18px; padding: 17px 38px; }
+        }
+
         @media (max-width: 768px) {
           .hero-stat-num { font-size: 40px; }
         }
+
         @keyframes bounce {
           0%, 100% { transform: translateX(-50%) translateY(0); }
           50%       { transform: translateX(-50%) translateY(8px); }

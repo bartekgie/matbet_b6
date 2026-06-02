@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 
 const COLORS = {
   navy:     '#1B2D4F',
-  red:      '#D93025',
+  red:      '#A8423A',
   textGray: '#6B7280',
 }
 
@@ -79,7 +79,7 @@ export default function MapaSection({
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill={COLORS.navy}/>
             </svg>
-            <span style={{ fontSize: 15, fontWeight: 600, color: COLORS.navy }}>{adres}</span>
+            <span className="mapa-adres" style={{ fontSize: 15, fontWeight: 600, color: COLORS.navy }}>{adres}</span>
           </div>
         )}
 
@@ -170,6 +170,9 @@ export default function MapaSection({
       </div>
 
       <style>{`
+        @media (min-width: 769px) {
+          .mapa-adres { font-size: 21px !important; }
+        }
         .miejsca-tile:hover {
           box-shadow: 0 6px 18px rgba(27,45,79,0.12) !important;
           transform: translateY(-3px) !important;

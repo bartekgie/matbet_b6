@@ -4,10 +4,11 @@ import { useState } from 'react'
 
 const C = {
   navy:   '#1B2D4F',
-  red:    '#D93025',
+  gold:   '#D5A23F',
+  red:    '#A8423A',
   gray:   '#6B7280',
-  border: '#dde1e7',
-  bg:     '#f5f7fa',
+  border: '#E8E0D5',
+  bg:     '#FAF9F6',
 }
 
 const ZGODA_1 = `Mam świadomość prawa dostępu do treści moich danych i ich poprawiania. Mam świadomość, iż w każdej chwili mogę wystąpić o zaprzestanie przetwarzania podanych przeze mnie danych osobowych w celach marketingowych, co skutkować będzie usunięciem danych z baz wykorzystywanych w celach marketingowych. Wyrażam zgodę na prowadzenie korespondencji drogą elektroniczną, zgodnie z ustawą o świadczeniu usług drogą elektroniczną (tekst jedn. Dz. U. z 2016 r. poz. 1030, 1579), a także drogą telefoniczną.`
@@ -196,12 +197,13 @@ export default function FormularzSection() {
             <button
               type="submit"
               disabled={status === 'sending'}
+              className="form-submit-btn"
               style={{
                 width: '100%', padding: '15px 24px',
-                background: status === 'sending' ? '#8a9ab5' : C.navy,
+                background: status === 'sending' ? '#c8a96a' : C.gold,
                 color: '#fff', border: 'none', borderRadius: 10,
                 fontSize: 15, fontWeight: 700, cursor: status === 'sending' ? 'default' : 'pointer',
-                transition: 'background 0.2s',
+                transition: 'background 0.2s, transform 0.15s, box-shadow 0.15s',
                 fontFamily: 'inherit',
               }}
             >
@@ -224,6 +226,7 @@ export default function FormularzSection() {
           margin-bottom: 20px;
         }
         .form-field { display: flex; flex-direction: column; }
+        .form-submit-btn:not(:disabled):hover { background: #C4922A !important; transform: translateY(-2px); box-shadow: 0 6px 18px rgba(213,162,63,0.35); }
         @media (max-width: 600px) {
           .form-row { grid-template-columns: 1fr; }
         }
@@ -239,7 +242,7 @@ const labelStyle: React.CSSProperties = {
 }
 
 const errStyle: React.CSSProperties = {
-  fontSize: 11, color: '#D93025', marginTop: 4,
+  fontSize: 11, color: '#A8423A', marginTop: 4,
 }
 
 function CheckboxField({

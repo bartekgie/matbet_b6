@@ -8,15 +8,15 @@ import { Lokal } from '@/lib/types'
 
 const C = {
   navy: '#1B2D4F',
-  red:  '#D93025',
-  gold: '#C9973A',
-  bg:   '#f5f7fa',
+  red:  '#A8423A',
+  gold: '#D5A23F',
+  bg:   '#FAF9F6',
 }
 
 const STATUS: Record<string, { bg: string; text: string; dot: string; label: string }> = {
-  wolne:      { bg: '#e8f5e9', text: '#2e7d32', dot: '#4caf50', label: 'Wolne'      },
-  rezerwacja: { bg: '#fff8e1', text: '#f57f17', dot: '#ffc107', label: 'Rezerwacja' },
-  sprzedane:  { bg: '#fce4ec', text: '#c62828', dot: '#ef5350', label: 'Sprzedane'  },
+  wolne:      { bg: '#E8F5EE', text: '#2A6B48', dot: '#5A9E6F', label: 'Wolne'      },
+  rezerwacja: { bg: '#FBF5E4', text: '#9A6E1A', dot: '#C9963A', label: 'Rezerwacja' },
+  sprzedane:  { bg: '#F5EDEC', text: '#8B3530', dot: '#C05A54', label: 'Sprzedane'  },
 }
 
 const fmt = (n: number) =>
@@ -160,7 +160,7 @@ function KontaktModal({ lokal, onClose }: { lokal: Lokal; onClose: () => void })
             <ModalCheckbox checked={zgoda2} onChange={setZgoda2} text={ZGODA_2} error={errors.zgoda2} onClear={() => setErrors(p => { const n = {...p}; delete n.zgoda2; return n })} />
           </div>
 
-          <p style={{ fontSize: 11, color: '#6b7280', lineHeight: 1.6, marginBottom: 24, padding: '10px 12px', background: '#f5f7fa', borderRadius: 8, border: '1px solid #dde1e7' }}>{KLAUZULA}</p>
+          <p style={{ fontSize: 11, color: '#6b7280', lineHeight: 1.6, marginBottom: 24, padding: '10px 12px', background: '#FAF9F6', borderRadius: 8, border: '1px solid #E8E0D5' }}>{KLAUZULA}</p>
 
           {status === 'ok' ? (
             <div style={{ textAlign: 'center', padding: '20px', background: '#d1fae5', borderRadius: 10, color: '#065f46', fontWeight: 700 }}>
@@ -232,7 +232,7 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
   ]
 
   return (
-    <main style={{ background: C.bg, fontFamily: 'sans-serif', paddingTop: 80 }}>
+    <main style={{ background: C.bg, fontFamily: 'inherit', paddingTop: 96 }}>
 
       {showKontakt && <KontaktModal lokal={lokal} onClose={() => setShowKontakt(false)} />}
 
@@ -354,19 +354,19 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
             {/* Legenda pomieszczeń */}
             {hasPom && (
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <div style={{ fontSize: 9, color: '#9ca3af', letterSpacing: 1.2, textTransform: 'uppercase', fontWeight: 700, marginBottom: 8 }}>Legenda</div>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                <div className="kl-leg-label" style={{ fontSize: 9, color: '#9ca3af', letterSpacing: 1.2, textTransform: 'uppercase', fontWeight: 700, marginBottom: 8 }}>Legenda</div>
+                <table className="kl-leg-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
                   <thead>
                     <tr style={{ background: C.navy }}>
-                      <th style={{ padding: '7px 10px', textAlign: 'left',  fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,.6)', letterSpacing: 0.8 }}>LP</th>
-                      <th style={{ padding: '7px 10px', textAlign: 'left',  fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,.6)', letterSpacing: 0.8 }}>POMIESZCZENIE</th>
-                      <th style={{ padding: '7px 10px', textAlign: 'right', fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,.6)', letterSpacing: 0.8 }}>POW.</th>
+                      <th className="kl-leg-th" style={{ padding: '7px 10px', textAlign: 'left',  fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,.6)', letterSpacing: 0.8 }}>LP</th>
+                      <th className="kl-leg-th" style={{ padding: '7px 10px', textAlign: 'left',  fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,.6)', letterSpacing: 0.8 }}>POMIESZCZENIE</th>
+                      <th className="kl-leg-th" style={{ padding: '7px 10px', textAlign: 'right', fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,.6)', letterSpacing: 0.8 }}>POW.</th>
                     </tr>
                   </thead>
                   <tbody>
                     {lokal.pomieszczenia!.map((p, i) => (
                       <tr key={i} style={{ borderBottom: '1px solid #f0f0f0', background: i % 2 === 0 ? '#fff' : '#fafafa' }}>
-                        <td style={{ padding: '7px 10px', color: '#9ca3af', fontWeight: 600, fontSize: 11 }}>{i + 1}</td>
+                        <td className="kl-leg-lp" style={{ padding: '7px 10px', color: '#9ca3af', fontWeight: 600, fontSize: 11 }}>{i + 1}</td>
                         <td style={{ padding: '7px 10px', color: '#374151', fontWeight: 500 }}>{p.nazwa.replace('Salon z aneksem kuchennym', 'Salon z aneksem kuch.')}</td>
                         <td style={{ padding: '7px 10px', textAlign: 'right', color: C.navy, fontWeight: 700, whiteSpace: 'nowrap' }}>{p.powierzchnia} m²</td>
                       </tr>
@@ -377,7 +377,7 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
                 {/* Rzut kondygnacji — pod legendą */}
                 {lokal.rzutKondygnacjiUrl && (
                   <div style={{ marginTop: 16 }}>
-                    <div style={{ fontSize: 9, color: '#9ca3af', letterSpacing: 1.2, textTransform: 'uppercase', fontWeight: 700, marginBottom: 6 }}>Rzut kondygnacji</div>
+                    <div className="kl-leg-label" style={{ fontSize: 9, color: '#9ca3af', letterSpacing: 1.2, textTransform: 'uppercase', fontWeight: 700, marginBottom: 6 }}>Rzut kondygnacji</div>
                     <div style={{ position: 'relative', width: '100%', aspectRatio: '4/3', background: '#f9fafb', borderRadius: 8, overflow: 'hidden', border: '1px solid #eaecf0' }}>
                       <Image
                         src={`${lokal.rzutKondygnacjiUrl}?auto=format`}
@@ -403,14 +403,14 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
                   justifyContent: 'center',
                   gap: 10,
                 }}>
-                  <div style={{ fontSize: 9, color: '#9ca3af', letterSpacing: 1.2, textTransform: 'uppercase', fontWeight: 700, marginBottom: 2 }}>Oznaczenia</div>
+                  <div className="kl-leg-label" style={{ fontSize: 9, color: '#9ca3af', letterSpacing: 1.2, textTransform: 'uppercase', fontWeight: 700, marginBottom: 2 }}>Oznaczenia</div>
                   {[
                     { label: 'Ściany nośne',    src: '/sciany nosne.png' },
                     { label: 'Ściany działowe', src: '/sciany dzialowe.png' },
                   ].map(({ label, src }) => (
                     <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <img src={src} alt={label} style={{ width: 32, height: 16, objectFit: 'cover', borderRadius: 3, flexShrink: 0 }} />
-                      <span style={{ fontSize: 11, color: '#374151', fontWeight: 500 }}>{label}</span>
+                      <img src={src} alt={label} className="kl-leg-wall-img" style={{ width: 32, height: 16, objectFit: 'cover', borderRadius: 3, flexShrink: 0 }} />
+                      <span className="kl-leg-wall-label" style={{ fontSize: 11, color: '#374151', fontWeight: 500 }}>{label}</span>
                     </div>
                   ))}
                 </div>
@@ -509,6 +509,10 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
       </div>
 
       <style>{`
+        .kl-btn { transition: background 0.15s, transform 0.15s, box-shadow 0.15s, border-color 0.15s; }
+        .kl-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(27,45,79,0.15); }
+        .kl-porownaj-btn { transition: background 0.15s, transform 0.15s; }
+        .kl-porownaj-btn:hover { transform: translateY(-1px); }
         .km-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
         @media (max-width: 500px) { .km-grid { grid-template-columns: 1fr !important; } }
         @media print {
@@ -517,7 +521,11 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
           nav        { display: none !important; }
           footer     { display: none !important; }
           main       { padding-top: 0 !important; background: #fff !important; }
-          body       { zoom: 0.72; margin: 0 !important; }
+          html       { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+          body       { zoom: 0.72; margin: 0 !important; transform-origin: top left; }
+          @supports not (zoom: 1) {
+            body { transform: scale(0.72); width: calc(100% / 0.72); }
+          }
           .kl-outer  { max-width: 100% !important; margin: 0 !important; padding: 0 4px !important; }
           #karta-print {
             box-shadow: none !important;
@@ -526,13 +534,21 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
             page-break-inside: avoid;
           }
           .kl-print-date { display: block !important; }
-          @page { margin: 8mm; size: A4 portrait; }
+          @page { size: A4 landscape; margin: 8mm; }
         }
         @media (min-width: 769px) {
+          .kl-has-pom { grid-template-columns: 1fr 252px !important; }
           .kl-has-pom .kl-rzut-col { display: flex; flex-direction: column; }
           .kl-has-pom .kl-rzut-img-wrap { flex-grow: 1; aspect-ratio: unset !important; min-height: 150px; }
+          .kl-leg-label     { font-size: 11px !important; }
+          .kl-leg-table     { font-size: 14px !important; }
+          .kl-leg-th        { font-size: 10px !important; padding: 8px 12px !important; }
+          .kl-leg-lp        { font-size: 13px !important; }
+          .kl-leg-wall-img  { width: 38px !important; height: 19px !important; }
+          .kl-leg-wall-label{ font-size: 13px !important; }
         }
         @media (max-width: 768px) {
+          main { padding-top: 80px !important; }
           .kl-outer { padding: 0 10px 20px !important; margin: 10px auto !important; }
           .kl-header { padding: 10px 14px !important; flex-wrap: wrap; gap: 6px 10px; }
           .kl-header-title { font-size: 18px !important; order: -1; width: 100%; text-align: center; }

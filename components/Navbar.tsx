@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react'
 
 const COLORS = {
   navy:  '#1B2D4F',
-  red:   '#D93025',
-  white: '#FFFFFF',
+  gold:  '#D5A23F',
+  bg:    '#F4F3EF',
+  text:  '#1B2D4F',
 }
 
 const IconMenu = () => (
@@ -24,8 +25,8 @@ const IconX = () => (
 )
 
 export default function Navbar({ budynekNazwa }: { budynekNazwa: string }) {
-  const [scrolled, setScrolled]   = useState(false)
-  const [menuOpen, setMenuOpen]   = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     const onScroll = () => {
@@ -48,11 +49,11 @@ export default function Navbar({ budynekNazwa }: { budynekNazwa: string }) {
       position: 'fixed',
       top: 0, left: 0, right: 0,
       zIndex: 100,
-      background: 'rgba(27, 45, 79, 0.96)',
+      background: COLORS.bg,
       backdropFilter: 'blur(8px)',
       WebkitBackdropFilter: 'blur(8px)',
-      height: 80,
-      boxShadow: scrolled ? '0 2px 20px rgba(0,0,0,0.3)' : 'none',
+      height: 96,
+      boxShadow: scrolled ? '0 2px 16px rgba(27,45,79,0.1)' : '0 1px 0 rgba(27,45,79,0.08)',
       transition: 'box-shadow 0.2s',
     }}>
       <div className="nav-inner" style={{
@@ -60,29 +61,30 @@ export default function Navbar({ budynekNazwa }: { budynekNazwa: string }) {
         height: '100%', display: 'flex', alignItems: 'center', gap: 24,
       }}>
 
-        {/* Logo */}
+        {/* Logo — filtr brightness(0) żeby biały PNG wyglądał na ciemnym tle; wymień na ciemną wersję jak będzie dostępna */}
         <a href="https://matbet.com.pl" target="_blank" rel="noopener noreferrer"
           style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="nav-logo-img" src="/Logo%20-%20Matbet%20-%20bia%C5%82e.png" alt="Matbet" style={{ height: 40, width: 'auto' }} />
+          <img className="nav-logo-img" src="/Logo%20-%20Matbet%20-%20niebieskie.png" alt="Matbet"
+            style={{ height: 40, width: 'auto' }} />
         </a>
 
         {/* Breadcrumb */}
         <div className="nav-breadcrumb" style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
-          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>Osiedle Nowe Miasto</span>
-          <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12 }}>/</span>
-          <span style={{ fontSize: 13, color: COLORS.white, fontWeight: 700 }}>{budynekNazwa}</span>
+          <span style={{ fontSize: 12, color: 'rgba(27,45,79,0.45)' }}>Osiedle Nowe Miasto</span>
+          <span style={{ color: 'rgba(27,45,79,0.25)', fontSize: 12 }}>/</span>
+          <span style={{ fontSize: 13, color: COLORS.navy, fontWeight: 700 }}>{budynekNazwa}</span>
         </div>
 
-        {/* Linki (ukryte na mobile) */}
+        {/* Linki */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 28 }} className="nav-links">
           {navLinks.map(link => (
             <a key={link.href} href={link.href} style={{
-              color: 'rgba(255,255,255,0.75)', fontSize: 13, textDecoration: 'none',
-              transition: 'color 0.15s', whiteSpace: 'nowrap',
+              color: 'rgba(27,45,79,0.65)', fontSize: 16, textDecoration: 'none',
+              transition: 'color 0.15s', whiteSpace: 'nowrap', fontWeight: 500,
             }}
-              onMouseEnter={e => (e.currentTarget.style.color = COLORS.white)}
-              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.75)')}
+              onMouseEnter={e => (e.currentTarget.style.color = COLORS.gold)}
+              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(27,45,79,0.65)')}
             >
               {link.label}
             </a>
@@ -93,7 +95,7 @@ export default function Navbar({ budynekNazwa }: { budynekNazwa: string }) {
         <a className="nav-cta"
           href="#kontakt"
           style={{
-            background: COLORS.red, color: COLORS.white,
+            background: COLORS.gold, color: '#fff',
             padding: '8px 18px', borderRadius: 20,
             fontSize: 13, fontWeight: 700, textDecoration: 'none',
             whiteSpace: 'nowrap', flexShrink: 0,
@@ -109,8 +111,8 @@ export default function Navbar({ budynekNazwa }: { budynekNazwa: string }) {
           aria-label="Menu"
           style={{
             display: 'none', alignItems: 'center', justifyContent: 'center',
-            width: 40, height: 40, background: menuOpen ? 'rgba(255,255,255,0.1)' : 'none',
-            border: 'none', cursor: 'pointer', color: COLORS.white,
+            width: 40, height: 40, background: menuOpen ? 'rgba(27,45,79,0.08)' : 'none',
+            border: 'none', cursor: 'pointer', color: COLORS.navy,
             flexShrink: 0, borderRadius: 8, transition: 'background 0.15s',
           }}
         >
@@ -119,24 +121,23 @@ export default function Navbar({ budynekNazwa }: { budynekNazwa: string }) {
 
       </div>
 
-      {/* Mobile dropdown menu */}
+      {/* Mobile dropdown */}
       {menuOpen && (
         <div style={{
           position: 'absolute', top: 80, left: 0, right: 0,
-          background: 'rgba(27, 45, 79, 0.98)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          borderTop: '1px solid rgba(255,255,255,0.1)',
+          background: COLORS.bg,
+          borderTop: '1px solid rgba(27,45,79,0.08)',
           display: 'flex', flexDirection: 'column',
           paddingBottom: 8, zIndex: 99,
+          boxShadow: '0 8px 24px rgba(27,45,79,0.1)',
         }}>
           {navLinks.map(link => (
             <a key={link.href} href={link.href}
               onClick={() => setMenuOpen(false)}
               style={{
-                color: 'rgba(255,255,255,0.85)', fontSize: 15, fontWeight: 600,
+                color: COLORS.navy, fontSize: 15, fontWeight: 600,
                 textDecoration: 'none', padding: '14px 24px',
-                borderBottom: '1px solid rgba(255,255,255,0.07)',
+                borderBottom: '1px solid rgba(27,45,79,0.07)',
               }}
             >
               {link.label}
@@ -146,7 +147,10 @@ export default function Navbar({ budynekNazwa }: { budynekNazwa: string }) {
       )}
 
       <style>{`
+        .nav-cta { transition: background 0.15s, transform 0.15s, box-shadow 0.15s; }
+        .nav-cta:hover { background: #C4922A !important; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(213,162,63,0.3); }
         @media (max-width: 768px) {
+          nav { height: 80px !important; }
           .nav-links { display: none !important; }
           .nav-inner { padding: 0 16px !important; gap: 0 !important; justify-content: space-between !important; position: relative !important; }
           .nav-logo-img { height: 28px !important; }

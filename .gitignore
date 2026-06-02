@@ -46,3 +46,7 @@ CLAUDE.local.md
 Daily\ Notes/
 Task\ Board.md
 Scratchpad.md
+
+# Sanity Studio build
+dist/
+.sanity/

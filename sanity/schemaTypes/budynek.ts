@@ -31,9 +31,9 @@ export default {
       of: [{
         type: 'object',
         fields: [
-          { name: 'ikona', title: 'Ikona (emoji lub nazwa)', type: 'string' },
-          { name: 'tytul', title: 'Tytuł',                  type: 'string' },
-          { name: 'opis',  title: 'Opis',                   type: 'string' },
+          { name: 'ikona', title: 'Ikona (plik z dysku)', type: 'image', description: 'Opcjonalna ikona — jeśli pusta, zostanie dobrana automatycznie na podstawie tytułu' },
+          { name: 'tytul', title: 'Tytuł',               type: 'string' },
+          { name: 'opis',  title: 'Opis',                 type: 'string' },
         ]
       }]
     },

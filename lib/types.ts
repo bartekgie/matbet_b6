@@ -22,7 +22,7 @@ export interface GaleriaItem {
 }
 
 export interface Cecha {
-  ikona?: string
+  ikonaUrl?: string
   tytul: string
   opis?: string
 }

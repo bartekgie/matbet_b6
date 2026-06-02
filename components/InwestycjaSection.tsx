@@ -5,9 +5,9 @@ import { Budynek } from '@/lib/types'
 
 const COLORS = {
   navy:     '#1B2D4F',
-  red:      '#D93025',
-  gold:     '#C9973A',
-  bgLight:  '#F5F5F2',
+  red:      '#A8423A',
+  gold:     '#B8922F',
+  bgLight:  '#F4EFE6',
   textGray: '#6B7280',
 }
 
@@ -21,11 +21,14 @@ const STATYSTYKI = [
 
 const FALLBACK_TEXT = 'Nowe Miasto to dynamicznie rozwijające się osiedle położone w zachodniej części Słupska, stanowiące część dzielnicy Niepodległości. Atrakcyjna lokalizacja to idealne miejsce dla osób pragnących spokojnej okolicy pełnej zieleni oraz łatwego dostępu do infrastruktury miejskiej. Na terenie osiedla powstają pięciopiętrowe budynki o wysokim standardzie, z windami, garażami i miejscami parkingowymi.'
 
-function ptToPlain(blocks: { _type: string; children?: { text?: string }[] }[]): string {
+function ptToBlocks(blocks: { _type: string; children?: { text?: string }[] }[]): string[] {
   return (blocks ?? [])
     .filter(b => b._type === 'block')
     .map(b => (b.children ?? []).map(c => c.text ?? '').join(''))
-    .join(' ')
+}
+
+function fixOrphans(text: string): string {
+  return text.replace(/ ([a-zA-ZąćęłńóśźżAĆĘŁŃÓŚŹŻ]) /g, ' $1 ')
 }
 
 /* ── SVG icons ──────────────────────────────────────────────── */
@@ -87,10 +90,10 @@ function CountUp({ target, label }: { target: number; label: string }) {
 
   return (
     <div ref={ref} style={{ textAlign: 'center' }}>
-      <div className="stat-num" style={{ fontSize: 44, fontWeight: 800, color: COLORS.gold, lineHeight: 1 }}>
+      <div className="stat-num" style={{ fontSize: 53, fontWeight: 800, color: COLORS.gold, lineHeight: 1 }}>
         {new Intl.NumberFormat('pl-PL').format(count)}
       </div>
-      <div className="stat-label" style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginTop: 8, maxWidth: 120 }}>
+      <div className="stat-label" style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', marginTop: 8, maxWidth: 120 }}>
         {label}
       </div>
     </div>
@@ -98,7 +101,7 @@ function CountUp({ target, label }: { target: number; label: string }) {
 }
 
 /* ── CechyGrid — fade-in przez IntersectionObserver ─────────── */
-function CechyGrid({ cechy }: { cechy: { tytul: string; opis?: string }[] }) {
+function CechyGrid({ cechy }: { cechy: { tytul: string; opis?: string; ikonaUrl?: string }[] }) {
   const [visible, setVisible] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -142,14 +145,17 @@ function CechyGrid({ cechy }: { cechy: { tytul: string; opis?: string }[] }) {
             transition:   `opacity 0.5s ease ${i * 60}ms, transform 0.5s ease ${i * 60}ms`,
           }}
         >
-          <div style={{ color: COLORS.navy, marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
-            {getCechaIcon(cecha.tytul)}
+          <div className="cechy-icon" style={{ color: COLORS.navy, marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
+            {cecha.ikonaUrl
+              ? <img src={cecha.ikonaUrl} alt="" style={{ width: 32, height: 32, objectFit: 'contain' }} />
+              : getCechaIcon(cecha.tytul)
+            }
           </div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: COLORS.navy, marginBottom: 6, lineHeight: 1.3 }}>
+          <div className="cechy-title" style={{ fontSize: 16, fontWeight: 700, color: COLORS.navy, marginBottom: 6, lineHeight: 1.3 }}>
             {cecha.tytul}
           </div>
           {cecha.opis && (
-            <div style={{ fontSize: 12, color: COLORS.textGray, lineHeight: 1.6 }}>
+            <div className="cechy-desc" style={{ fontSize: 14, color: COLORS.textGray, lineHeight: 1.6 }}>
               {cecha.opis}
             </div>
           )}
@@ -162,17 +168,17 @@ function CechyGrid({ cechy }: { cechy: { tytul: string; opis?: string }[] }) {
 
 /* ── Main component ─────────────────────────────────────────── */
 export default function InwestycjaSection({ budynek }: { budynek: Budynek }) {
-  const text = (budynek.opis && budynek.opis.length > 0)
-    ? ptToPlain(budynek.opis)
-    : FALLBACK_TEXT
+  const paragraphs = (budynek.opis && budynek.opis.length > 0)
+    ? ptToBlocks(budynek.opis)
+    : [FALLBACK_TEXT]
 
   return (
     <section id="inwestycja" style={{ background: '#fff', padding: '80px 0 0 0' }}>
 
-      <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 32px 64px' }}>
+      <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 32px 24px' }}>
 
         {/* Tekst — zawsze widoczny, bez animacji blokującej */}
-        <div style={{ textAlign: 'center', marginBottom: 48, maxWidth: 760, margin: '0 auto 48px' }}>
+        <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <p style={{
             fontSize: 12, color: COLORS.red, letterSpacing: 2,
             fontWeight: 700, textTransform: 'uppercase', marginBottom: 14,
@@ -184,16 +190,20 @@ export default function InwestycjaSection({ budynek }: { budynek: Budynek }) {
             fontWeight: 800, color: COLORS.navy,
             marginBottom: 18, lineHeight: 1.15,
           }}>
-            Najambitniejszy projekt budowlany w Słupsku
+            Największa inwestycja w Słupsku
           </h2>
-          <p style={{
-            fontSize: 'clamp(15px, 1.1vw, 17px)',
-            lineHeight: 1.9,
-            color: COLORS.textGray,
-            margin: 0,
-          }}>
-            {text}
-          </p>
+          {paragraphs.map((p, i) => (
+            <p key={i} style={{
+              fontSize: 'clamp(15px, 1.1vw, 17px)',
+              lineHeight: 1.9,
+              color: COLORS.textGray,
+              margin: p === '' ? '0 0 1em' : '0 0 0.6em',
+              minHeight: p === '' ? '1em' : undefined,
+              textAlign: 'justify',
+            }}>
+              {p === '' ? '' : fixOrphans(p)}
+            </p>
+          ))}
         </div>
 
         {/* Kafle cech — fade-in przez IntersectionObserver */}
@@ -203,22 +213,25 @@ export default function InwestycjaSection({ budynek }: { budynek: Budynek }) {
 
       </div>
 
-      {/* Stats bar — full width */}
-      <div className="stats-box" style={{
-        background: COLORS.navy,
-        padding: '48px 32px',
-        display: 'flex',
-        justifyContent: 'space-around',
-        flexWrap: 'wrap',
-        gap: 32,
-      }}>
-        {STATYSTYKI.map(s => (
-          <CountUp
-            key={s.label}
-            target={parseInt(s.val.replace(/\s/g, ''), 10)}
-            label={s.label}
-          />
-        ))}
+      {/* Stats bar — full width navy, zawartość w maxWidth 1400 */}
+      <div className="stats-box" style={{ background: COLORS.navy, padding: '48px 0' }}>
+        <div className="stats-inner" style={{
+          maxWidth: 1400,
+          margin: '0 auto',
+          padding: '0 32px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 32,
+        }}>
+          {STATYSTYKI.map(s => (
+            <CountUp
+              key={s.label}
+              target={parseInt(s.val.replace(/\s/g, ''), 10)}
+              label={s.label}
+            />
+          ))}
+        </div>
       </div>
 
       <style>{`
@@ -230,13 +243,22 @@ export default function InwestycjaSection({ budynek }: { budynek: Budynek }) {
           position: absolute;
           top: 0; left: 0;
           width: 0; height: 4px;
-          background: #D93025;
+          background: #D5A23F;
           transition: width .5s ease;
         }
         .cechy-tile:hover::before { width: 100%; }
         .cechy-tile:hover {
           transform: translateY(-4px) !important;
           box-shadow: 0 8px 24px rgba(27,45,79,.10) !important;
+        }
+        .cechy-icon svg { width: 34px; height: 34px; }
+        .cechy-icon img { width: 34px !important; height: 34px !important; }
+        @media (min-width: 901px) {
+          .cechy-tile  { padding: 32px 24px 24px !important; }
+          .cechy-icon svg { width: 52px !important; height: 52px !important; }
+          .cechy-icon img { width: 52px !important; height: 52px !important; }
+          .cechy-title { font-size: 18px !important; }
+          .cechy-desc  { font-size: 16px !important; }
         }
         @media (max-width: 900px) {
           .cechy-tile { flex: 0 0 calc(50% - 8px) !important; }
@@ -246,10 +268,11 @@ export default function InwestycjaSection({ budynek }: { budynek: Budynek }) {
         }
 
         @media (max-width: 768px) {
-          .stats-box { padding: 28px 20px !important; display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 24px 16px !important; }
-          .stats-box > div:last-child { grid-column: 1 / -1 !important; }
-          .stat-num { font-size: 34px !important; }
-          .stat-label { font-size: 11px !important; margin-top: 6px !important; max-width: none !important; }
+          .stats-box { padding: 28px 0 !important; }
+          .stats-inner { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 24px 16px !important; padding: 0 20px !important; }
+          .stats-inner > div:last-child { grid-column: 1 / -1 !important; }
+          .stat-num { font-size: 41px !important; }
+          .stat-label { font-size: 13px !important; margin-top: 6px !important; max-width: none !important; }
           .cechy-tile:active { transform: scale(0.95) translateY(0) !important; }
         }
       `}</style>

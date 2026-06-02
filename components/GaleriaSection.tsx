@@ -6,8 +6,8 @@ import { GaleriaItem } from '@/lib/types'
 
 const COLORS = {
   navy:    '#1B2D4F',
-  red:     '#D93025',
-  bgLight: '#F5F5F2',
+  red:     '#A8423A',
+  bgLight: '#F4EFE6',
 }
 
 function Thumb({ item, index, onClick, sizes = '25vw' }: {
@@ -126,8 +126,7 @@ export default function GaleriaSection({ galeria }: { galeria: GaleriaItem[] }) 
 
         {/* Nagłówek */}
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <p style={{ fontSize: 12, letterSpacing: 2, color: COLORS.red, fontWeight: 700, textTransform: 'uppercase', marginBottom: 12 }}>GALERIA</p>
-          <h2 style={{ fontSize: 36, fontWeight: 800, color: COLORS.navy }}>Nasza inwestycja</h2>
+          <h2 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', fontWeight: 800, color: COLORS.navy }}>Osiedle Nowe Miasto</h2>
         </div>
 
         {/* Siatka Airbnb-style */}

@@ -11,9 +11,9 @@ const COLORS = {
 }
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
-  wolne:      { bg: '#BBD937', text: '#1B2D4F', dot: '#9ab82e' },
-  rezerwacja: { bg: '#F5C518', text: '#1B2D4F', dot: '#d4a800' },
-  sprzedane:  { bg: '#D93025', text: '#ffffff', dot: '#b32219' },
+  wolne:      { bg: '#E8F5EE', text: '#2A6B48', dot: '#5A9E6F' },
+  rezerwacja: { bg: '#FBF5E4', text: '#9A6E1A', dot: '#C9963A' },
+  sprzedane:  { bg: '#F5EDEC', text: '#8B3530', dot: '#C05A54' },
 }
 
 const fmt = (cena: number) =>
@@ -90,9 +90,9 @@ function Porownywarka({ lokale, onClose }: { lokale: Lokal[]; onClose: () => voi
       ? `<span style="background:#d1fae5;color:#065f46;font-weight:700;border-radius:6px;padding:3px 8px;display:inline-block">${v}</span>`
       : v
     const SC: Record<string, { bg: string; c: string; dot: string; label: string }> = {
-      wolne:      { bg: '#BBD937', c: '#1B2D4F', dot: '#9ab82e', label: 'Wolne'      },
-      rezerwacja: { bg: '#F5C518', c: '#1B2D4F', dot: '#d4a800', label: 'Rezerwacja' },
-      sprzedane:  { bg: '#D93025', c: '#ffffff', dot: '#b32219', label: 'Sprzedane'  },
+      wolne:      { bg: '#E8F5EE', c: '#2A6B48', dot: '#5A9E6F', label: 'Wolne'      },
+      rezerwacja: { bg: '#FBF5E4', c: '#9A6E1A', dot: '#C9963A', label: 'Rezerwacja' },
+      sprzedane:  { bg: '#F5EDEC', c: '#8B3530', dot: '#C05A54', label: 'Sprzedane'  },
     }
     const rows: { label: string; cells: string[] }[] = [
       { label: 'RZUT',             cells: lokale.map(l => l.thumbRzut
@@ -122,7 +122,7 @@ table{width:100%;border-collapse:collapse}
 .legend{font-size:10px;color:#6b7280;margin-top:8px;display:flex;align-items:center;gap:6px}
 .ld{width:9px;height:9px;background:#d1fae5;border:1px solid #a7f3d0;border-radius:2px;display:inline-block}
 .date{font-size:10px;color:#9ca3af;margin-top:6px;text-align:right}
-@media print{*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}@page{size:A4 portrait;margin:8mm}html,body{height:100%;overflow:hidden}body{padding:0;zoom:0.72}img{max-height:90px!important;width:auto!important}td,th{padding:6px 10px!important}}</style></head>
+@media print{*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}@page{size:A4 landscape;margin:8mm}body{padding:0;margin:0;zoom:0.9}img{max-height:90px!important;width:auto!important}td,th{padding:6px 10px!important}}</style></head>
 <body>
 <h1>Porównanie lokali</h1>
 <div class="sub">Matbet — Osiedle Nowe Miasto, Słupsk</div>
@@ -452,13 +452,13 @@ export default function WyszukiwarkaSection({ lokale }: { lokale: Lokal[] }) {
   })
 
   return (
-    <section id="mieszkania" style={{ paddingTop: 80, paddingBottom: porownaj.length > 0 ? 90 : 0, background: '#f0f2f5', fontFamily: 'sans-serif' }}>
+    <section id="mieszkania" style={{ paddingTop: 80, paddingBottom: porownaj.length > 0 ? 90 : 0, background: '#F4EFE6', fontFamily: 'inherit', scrollMarginTop: 48 }}>
 
       {showModal && <Porownywarka lokale={wybraneObiekty} onClose={() => setShowModal(false)} />}
 
       {/* Nagłówek sekcji */}
       <div style={{ textAlign: 'center', paddingBottom: 40, paddingTop: 8 }}>
-        <p style={{ fontSize: 12, letterSpacing: 2, color: '#D93025', fontWeight: 700, textTransform: 'uppercase', marginBottom: 12 }}>NOWE MIASTO, BUDYNEK B6</p>
+        <p style={{ fontSize: 12, letterSpacing: 2, color: '#A8423A', fontWeight: 700, textTransform: 'uppercase', marginBottom: 12 }}>NOWE MIASTO, BUDYNEK B6</p>
         <h2 style={{ fontSize: 36, fontWeight: 800, color: COLORS.navy, marginBottom: 12 }}>Znajdź mieszkanie</h2>
         <p style={{ fontSize: 16, color: '#6B7280' }}>Wybierz lokal dopasowany do Twoich potrzeb</p>
       </div>
