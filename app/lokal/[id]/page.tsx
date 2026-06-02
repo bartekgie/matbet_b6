@@ -1,4 +1,4 @@
-import { client } from '@/lib/sanity'
+import { client } from '@/lib/client'
 import { LOKAL_QUERY } from '@/lib/queries'
 import { notFound } from 'next/navigation'
 import Navbar      from '@/components/Navbar'
