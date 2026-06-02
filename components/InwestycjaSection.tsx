@@ -103,10 +103,11 @@ function CountUp({ target, label }: { target: number; label: string }) {
 /* ── CechyGrid — fade-in przez IntersectionObserver ─────────── */
 function CechyGrid({ cechy }: { cechy: { tytul: string; opis?: string; ikonaUrl?: string }[] }) {
   const [visible, setVisible] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const drag = useRef({ active: false, startX: 0, scrollLeft: 0 })
 
   useEffect(() => {
-    const el = ref.current
+    const el = scrollRef.current
     if (!el) return
     const io = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) { setVisible(true); io.disconnect() }
@@ -114,6 +115,31 @@ function CechyGrid({ cechy }: { cechy: { tytul: string; opis?: string; ikonaUrl?
     io.observe(el)
     return () => io.disconnect()
   }, [])
+
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType === 'touch') return
+    const el = scrollRef.current
+    if (!el) return
+    drag.current = { active: true, startX: e.clientX, scrollLeft: el.scrollLeft }
+    el.setPointerCapture(e.pointerId)
+    el.style.cursor = 'grabbing'
+  }
+
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!drag.current.active) return
+    const el = scrollRef.current
+    if (!el) return
+    el.scrollLeft = drag.current.scrollLeft - (e.clientX - drag.current.startX)
+  }
+
+  const onPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!drag.current.active) return
+    drag.current.active = false
+    const el = scrollRef.current
+    if (!el) return
+    el.releasePointerCapture(e.pointerId)
+    el.style.cursor = 'grab'
+  }
 
   return (
     <div>
@@ -124,7 +150,15 @@ function CechyGrid({ cechy }: { cechy: { tytul: string; opis?: string; ikonaUrl?
           <path d="M5 12h14M13 6l6 6-6 6"/>
         </svg>
       </div>
-    <div ref={ref} className="cechy-scroll" style={{ display: 'flex', gap: 16, overflowX: 'auto', scrollSnapType: 'x mandatory' }}>
+    <div
+      ref={scrollRef}
+      className="cechy-scroll"
+      style={{ display: 'flex', gap: 16, overflowX: 'auto', scrollSnapType: 'x mandatory', cursor: 'grab' }}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+    >
       {cechy.map((cecha, i) => (
         <div
           key={i}
