@@ -194,7 +194,7 @@ function CechyGrid({ cechy }: { cechy: { tytul: string; opis?: string; ikonaUrl?
         >
           <div className="cechy-icon" style={{ color: COLORS.navy, marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
             {cecha.ikonaUrl
-              ? <img src={cecha.ikonaUrl} alt="" style={{ width: 32, height: 32, objectFit: 'contain' }} />
+              ? <img src={cecha.ikonaUrl} alt="" style={{ width: 44, height: 44, objectFit: 'contain' }} />
               : getCechaIcon(cecha.tytul)
             }
           </div>
@@ -203,7 +203,7 @@ function CechyGrid({ cechy }: { cechy: { tytul: string; opis?: string; ikonaUrl?
           </div>
           {cecha.opis && (
             <div className="cechy-desc" style={{ fontSize: 14, color: COLORS.textGray, lineHeight: 1.6 }}>
-              {cecha.opis}
+              {fixOrphans(cecha.opis)}
             </div>
           )}
         </div>
@@ -317,12 +317,12 @@ export default function InwestycjaSection({ budynek }: { budynek: Budynek }) {
           transform: translateY(-4px) !important;
           box-shadow: 0 8px 24px rgba(27,45,79,.10) !important;
         }
-        .cechy-icon svg { width: 34px; height: 34px; }
-        .cechy-icon img { width: 34px !important; height: 34px !important; }
+        .cechy-icon svg { width: 44px; height: 44px; }
+        .cechy-icon img { width: 44px !important; height: 44px !important; }
         @media (min-width: 901px) {
           .cechy-tile  { padding: 32px 24px 24px !important; }
-          .cechy-icon svg { width: 52px !important; height: 52px !important; }
-          .cechy-icon img { width: 52px !important; height: 52px !important; }
+          .cechy-icon svg { width: 68px !important; height: 68px !important; }
+          .cechy-icon img { width: 68px !important; height: 68px !important; }
           .cechy-title { font-size: 18px !important; }
           .cechy-desc  { font-size: 16px !important; }
         }
