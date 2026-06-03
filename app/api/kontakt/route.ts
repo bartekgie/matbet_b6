@@ -12,7 +12,7 @@ export async function POST(req: Request) {
       : `Zapytanie o lokal – ${imie} ${nazwisko}`
 
     const { error } = await resend.emails.send({
-      from:    'Formularz Matbet <formularz@matbet.com.pl>',
+      from:    'Nowe Miasto Matbet <nowemiasto@matbet.com.pl>',
       to:      [process.env.MAIL_TO || 'bartosz.giecewicz@gmail.com'],
       subject,
       html: `
