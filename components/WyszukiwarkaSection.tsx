@@ -398,7 +398,18 @@ export default function WyszukiwarkaSection({ lokale }: { lokale: Lokal[] }) {
       setSortowanie(saved.sortowanie)
       setWidok(saved.widok)
       if (saved.powRange) setPowRange(saved.powRange)
-      requestAnimationFrame(() => window.scrollTo({ top: saved.scrollY, behavior: 'instant' }))
+      // podwójny RAF czeka na pełny render layoutu (fix dla mobile)
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          window.scrollTo(0, saved.scrollY)
+          // fallback dla iOS Safari który resetuje scroll po hydration
+          setTimeout(() => {
+            if (Math.abs(window.scrollY - saved.scrollY) > 20) {
+              window.scrollTo(0, saved.scrollY)
+            }
+          }, 150)
+        })
+      })
     } catch {}
   }, [])
 
@@ -708,7 +719,7 @@ export default function WyszukiwarkaSection({ lokale }: { lokale: Lokal[] }) {
                   const wPorownaniu = porownaj.includes(l._id)
                   const maxOsiagniete = porownaj.length >= 3 && !wPorownaniu
                   return (
-                    <tr key={l._id} className="tabela-row" onClick={(e) => { if ((e.target as HTMLElement).closest('a, button')) return; router.push(`/lokal/${l._id}`) }} style={{ borderBottom: '1px solid #f0f0f0', background: wPorownaniu ? '#f0f4ff' : i % 2 === 0 ? '#fff' : '#fafafa', outline: wPorownaniu ? '2px solid #4f7cff' : 'none', outlineOffset: -2  }}>
+                    <tr key={l._id} className="tabela-row" onClick={(e) => { if ((e.target as HTMLElement).closest('a, button')) return; saveState(); router.push(`/lokal/${l._id}`) }} style={{ borderBottom: '1px solid #f0f0f0', background: wPorownaniu ? '#f0f4ff' : i % 2 === 0 ? '#fff' : '#fafafa', outline: wPorownaniu ? '2px solid #4f7cff' : 'none', outlineOffset: -2  }}>
                       <td style={{ padding: '10px 12px 10px 16px', width: 36 }}>
                         <button onClick={() => togglePorownaj(l._id)} disabled={maxOsiagniete} style={{ width: 22, height: 22, borderRadius: 6, border: '2px solid', borderColor: wPorownaniu ? '#4f7cff' : '#ddd', background: wPorownaniu ? '#4f7cff' : '#fff', color: wPorownaniu ? '#fff' : 'transparent', cursor: maxOsiagniete ? 'not-allowed' : 'pointer', fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: maxOsiagniete ? .4 : 1 }}>
                           {wPorownaniu ? '✓' : ''}
