@@ -103,8 +103,9 @@ function CountUp({ target, label }: { target: number; label: string }) {
 /* ── CechyGrid — fade-in przez IntersectionObserver ─────────── */
 function CechyGrid({ cechy }: { cechy: { tytul: string; opis?: string; ikonaUrl?: string }[] }) {
   const [visible, setVisible] = useState(false)
+  const [canPrev, setCanPrev] = useState(false)
+  const [canNext, setCanNext] = useState(true)
   const scrollRef = useRef<HTMLDivElement>(null)
-  const drag = useRef({ active: false, startX: 0, scrollLeft: 0 })
 
   useEffect(() => {
     const el = scrollRef.current
@@ -116,33 +117,49 @@ function CechyGrid({ cechy }: { cechy: { tytul: string; opis?: string; ikonaUrl?
     return () => io.disconnect()
   }, [])
 
-  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (e.pointerType === 'touch') return
+  const updateArrows = () => {
     const el = scrollRef.current
     if (!el) return
-    drag.current = { active: true, startX: e.clientX, scrollLeft: el.scrollLeft }
-    el.setPointerCapture(e.pointerId)
-    el.style.cursor = 'grabbing'
+    setCanPrev(el.scrollLeft > 8)
+    setCanNext(el.scrollLeft < el.scrollWidth - el.clientWidth - 8)
   }
 
-  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!drag.current.active) return
+  useEffect(() => {
     const el = scrollRef.current
     if (!el) return
-    el.scrollLeft = drag.current.scrollLeft - (e.clientX - drag.current.startX)
-  }
+    el.addEventListener('scroll', updateArrows, { passive: true })
+    updateArrows()
+    return () => el.removeEventListener('scroll', updateArrows)
+  }, [])
 
-  const onPointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!drag.current.active) return
-    drag.current.active = false
+  const scroll = (dir: 'prev' | 'next') => {
     const el = scrollRef.current
     if (!el) return
-    el.releasePointerCapture(e.pointerId)
-    el.style.cursor = 'grab'
+    const card = el.querySelector('.cechy-tile') as HTMLElement
+    const step = card ? card.offsetWidth + 16 : 280
+    el.scrollBy({ left: dir === 'next' ? step : -step, behavior: 'smooth' })
   }
 
   return (
-    <div>
+    <div style={{ position: 'relative' }}>
+      {/* Strzałki — tylko desktop */}
+      <button
+        className="cechy-arrow cechy-arrow-prev"
+        onClick={() => scroll('prev')}
+        aria-label="Poprzedni"
+        style={{ opacity: canPrev ? 1 : 0, pointerEvents: canPrev ? 'auto' : 'none' }}
+      >
+        ‹
+      </button>
+      <button
+        className="cechy-arrow cechy-arrow-next"
+        onClick={() => scroll('next')}
+        aria-label="Następny"
+        style={{ opacity: canNext ? 1 : 0, pointerEvents: canNext ? 'auto' : 'none' }}
+      >
+        ›
+      </button>
+
       {/* Swipe hint — tylko mobile */}
       <div className="swipe-hint" style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, color: COLORS.textGray, fontSize: 12 }}>
         <span>przesuń</span>
@@ -153,11 +170,7 @@ function CechyGrid({ cechy }: { cechy: { tytul: string; opis?: string; ikonaUrl?
     <div
       ref={scrollRef}
       className="cechy-scroll"
-      style={{ display: 'flex', gap: 16, overflowX: 'auto', scrollSnapType: 'x mandatory', cursor: 'grab' }}
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={onPointerUp}
-      onPointerCancel={onPointerUp}
+      style={{ display: 'flex', gap: 16, overflowX: 'auto', scrollSnapType: 'x mandatory' }}
     >
       {cechy.map((cecha, i) => (
         <div
@@ -271,6 +284,25 @@ export default function InwestycjaSection({ budynek }: { budynek: Budynek }) {
       <style>{`
         .cechy-scroll::-webkit-scrollbar { display: none; }
         .cechy-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        .cechy-arrow {
+          display: none;
+          position: absolute;
+          top: 50%; transform: translateY(-50%);
+          z-index: 10;
+          width: 44px; height: 44px;
+          border-radius: 50%;
+          border: 2px solid #1B2D4F;
+          background: #fff;
+          color: #1B2D4F;
+          font-size: 26px; line-height: 1;
+          cursor: pointer;
+          align-items: center; justify-content: center;
+          transition: background 0.15s, color 0.15s, opacity 0.2s;
+          box-shadow: 0 2px 10px rgba(27,45,79,0.12);
+        }
+        .cechy-arrow:hover { background: #1B2D4F; color: #D5A23F; }
+        .cechy-arrow-prev { left: -22px; }
+        .cechy-arrow-next { right: -22px; }
         .cechy-tile { transition: transform .4s ease, box-shadow .4s ease; }
         .cechy-tile::before {
           content: '';
@@ -293,6 +325,10 @@ export default function InwestycjaSection({ budynek }: { budynek: Budynek }) {
           .cechy-icon img { width: 52px !important; height: 52px !important; }
           .cechy-title { font-size: 18px !important; }
           .cechy-desc  { font-size: 16px !important; }
+        }
+        @media (min-width: 901px) {
+          .cechy-arrow { display: flex; }
+          .swipe-hint { display: none !important; }
         }
         @media (max-width: 900px) {
           .cechy-tile { flex: 0 0 calc(50% - 8px) !important; }
