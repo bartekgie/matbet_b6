@@ -15,7 +15,7 @@ const dmSans = DM_Sans({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://www.matbet.com.pl'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://nowemiasto.matbet.com.pl'),
   icons: { icon: '/favicon.png' },
   title: {
     default: 'Matbet Deweloper – Osiedle Nowe Miasto Słupsk',

@@ -331,7 +331,7 @@ function PasekPorownania({ wybrane, lokale, onToggle, onOpen, onClear }: {
 }
 
 // ─── Główny komponent sekcji ───────────────────────────────────────────────────
-export default function WyszukiwarkaSection({ lokale }: { lokale: Lokal[] }) {
+export default function WyszukiwarkaSection({ lokale, budynekNazwa }: { lokale: Lokal[]; budynekNazwa?: string }) {
   const router = useRouter()
 
   const [filtry, setFiltry]         = useState(INIT_FILTRY)
@@ -469,7 +469,7 @@ export default function WyszukiwarkaSection({ lokale }: { lokale: Lokal[] }) {
 
       {/* Nagłówek sekcji */}
       <div style={{ textAlign: 'center', paddingBottom: 40, paddingTop: 8 }}>
-        <p style={{ fontSize: 12, letterSpacing: 2, color: '#A8423A', fontWeight: 700, textTransform: 'uppercase', marginBottom: 12 }}>NOWE MIASTO, BUDYNEK B6</p>
+        <p style={{ fontSize: 12, letterSpacing: 2, color: '#A8423A', fontWeight: 700, textTransform: 'uppercase', marginBottom: 12 }}>NOWE MIASTO{budynekNazwa ? `, ${budynekNazwa.toUpperCase()}` : ''}</p>
         <h2 style={{ fontSize: 36, fontWeight: 800, color: COLORS.navy, marginBottom: 12 }}>Znajdź mieszkanie</h2>
         <p style={{ fontSize: 16, color: '#6B7280' }}>Wybierz lokal dopasowany do Twoich potrzeb</p>
       </div>

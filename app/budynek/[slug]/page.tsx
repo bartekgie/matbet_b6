@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const title = `${budynek.nazwa} – Osiedle Nowe Miasto Słupsk`
   const description = `${budynek.nazwa} to nowoczesna inwestycja dewelopera Matbet w Słupsku. ${budynek.liczbaLokali ? `${budynek.liczbaLokali} lokali` : 'Lokale'} na sprzedaż w Osiedlu Nowe Miasto. ${budynek.adres ?? ''}`.trim()
-  const url = `https://www.matbet.com.pl/budynek/${slug}`
+  const url = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://nowemiasto.matbet.com.pl'}/budynek/${slug}`
 
   return {
     title,
@@ -54,11 +54,11 @@ export default async function BudynekPage({ params }: { params: Promise<{ slug: 
       <Navbar budynekNazwa={budynek.nazwa} />
       <main>
         <HeroSection budynek={budynek} wolneLokali={lokale.filter((l: { status: string }) => l.status === 'wolne').length} />
-        <WyszukiwarkaSection lokale={lokale} />
+        <WyszukiwarkaSection lokale={lokale} budynekNazwa={budynek.nazwa} />
         <InwestycjaSection budynek={budynek} />
         <GaleriaSection galeria={budynek.galeria ?? []} />
         <MapaSection lat={budynek.lat} lng={budynek.lng} adres={budynek.adres} />
-        <FormularzSection />
+        <FormularzSection budynekNazwa={budynek.nazwa} />
       </main>
       <Footer />
     </>
