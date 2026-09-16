@@ -326,7 +326,7 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
               {lokal.rzutUrl ? (
                 <div className="kl-rzut-img-wrap" style={{ position: 'relative', width: '100%', aspectRatio: '4/3', background: '#f9fafb', borderRadius: 8, overflow: 'hidden', border: '1px solid #eaecf0' }}>
                   {lokal.budynek?.logoUrl && (
-                    <div className="print-only" style={{ position: 'absolute', top: 18, left: 18, zIndex: 10, width: 270, height: 132 }}>
+                    <div className="print-only kl-logo-inwestycji" style={{ position: 'absolute', top: 18, left: 18, zIndex: 10, width: 270, height: 132 }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={`${lokal.budynek.logoUrl}?auto=format&w=220`} alt="Logo inwestycji" style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'left top' }} />
                     </div>
@@ -353,7 +353,7 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
               ) : (
                 <div style={{ position: 'relative', aspectRatio: '4/3', background: '#f9fafb', borderRadius: 8, border: '1px solid #eaecf0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: 12 }}>
                   {lokal.budynek?.logoUrl && (
-                    <div className="print-only" style={{ position: 'absolute', top: 18, left: 18, zIndex: 10, width: 270, height: 132 }}>
+                    <div className="print-only kl-logo-inwestycji" style={{ position: 'absolute', top: 18, left: 18, zIndex: 10, width: 270, height: 132 }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={`${lokal.budynek.logoUrl}?auto=format&w=220`} alt="Logo inwestycji" style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'left top' }} />
                     </div>
@@ -606,6 +606,46 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
           .kl-disclaimer-text { font-size: 14px !important; line-height: 1.5 !important; }
           .kl-firm-footer-info{ font-size: 15px !important; }
           @page { size: A4 landscape; margin: 8mm; }
+        }
+        /* Wersja mobilna karty PDF — telefony przy druku/zapisie do PDF czesto
+           ignoruja @page landscape i tak czy inaczej renderuja w pionie. Ten blok
+           dotyczy WYLACZNIE tego przypadku (wykrywany przez orientation:portrait,
+           niezaleznie od urzadzenia) i NIE dotyka niczego z wersji poziomej powyzej. */
+        @media print and (orientation: portrait) {
+          @page { size: A4 portrait; margin: 8mm; }
+          body { zoom: 0.86 !important; }
+          @supports not (zoom: 1) {
+            body { transform: scale(0.86) !important; width: calc(100% / 0.86) !important; }
+          }
+          /* Rzut i legenda jedna pod drugą zamiast obok siebie — w pionie nie ma miejsca na dwie kolumny */
+          .kl-main { grid-template-columns: 1fr !important; padding: 10px 18px 0 !important; gap: 10px !important; }
+          .kl-has-pom .kl-rzut-col { display: block !important; }
+          .kl-rzut-img-wrap { flex-grow: 0 !important; aspect-ratio: 4/3 !important; max-height: 200px !important; width: auto !important; max-width: 280px !important; margin: 0 auto !important; }
+          .kl-logo-inwestycji { width: 140px !important; height: 68px !important; top: 8px !important; left: 8px !important; }
+
+          .kl-header      { padding: 10px 18px !important; min-height: 44px !important; }
+          .kl-params-container { padding: 0 18px !important; }
+          .kl-param-item  { padding: 6px 12px !important; }
+          .kl-footer      { margin: 8px 18px 0 !important; padding: 6px 12px !important; }
+          .kl-firm-footer { padding: 10px 18px !important; min-height: 44px !important; margin: 8px 0 !important; }
+          .kl-rzut-kond   { margin-top: 4px !important; }
+          .kl-rzut-kond-img { max-height: 90px !important; }
+          .kl-oznaczenia-box { margin-top: 4px !important; padding: 5px 10px !important; gap: 3px !important; }
+          .kl-leg-table td, .kl-leg-table th { padding: 3px 10px !important; }
+
+          /* Mniejsze czcionki niz w wersji poziomej - w pionie mniej miejsca na szerokosc */
+          .kl-header-bldg     { font-size: 11px !important; }
+          .kl-header-title    { font-size: 20px !important; }
+          .kl-param-label     { font-size: 10px !important; }
+          .kl-param-val       { font-size: 16px !important; }
+          .kl-rzut-label      { font-size: 11px !important; }
+          .kl-leg-label       { font-size: 12px !important; }
+          .kl-leg-table       { font-size: 14px !important; }
+          .kl-leg-th          { font-size: 11px !important; padding: 4px 10px !important; }
+          .kl-leg-lp          { font-size: 13px !important; }
+          .kl-leg-wall-label  { font-size: 13px !important; }
+          .kl-disclaimer-text { font-size: 11px !important; line-height: 1.4 !important; }
+          .kl-firm-footer-info{ font-size: 12px !important; }
         }
       `}</style>
     </main>
