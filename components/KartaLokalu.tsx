@@ -326,7 +326,7 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
               {lokal.rzutUrl ? (
                 <div className="kl-rzut-img-wrap" style={{ position: 'relative', width: '100%', aspectRatio: '4/3', background: '#f9fafb', borderRadius: 8, overflow: 'hidden', border: '1px solid #eaecf0' }}>
                   {lokal.budynek?.logoUrl && (
-                    <div className="print-only" style={{ position: 'absolute', top: 18, left: 18, zIndex: 10, width: 135, height: 66 }}>
+                    <div className="print-only" style={{ position: 'absolute', top: 18, left: 18, zIndex: 10, width: 270, height: 132 }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={`${lokal.budynek.logoUrl}?auto=format&w=220`} alt="Logo inwestycji" style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'left top' }} />
                     </div>
@@ -353,7 +353,7 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
               ) : (
                 <div style={{ position: 'relative', aspectRatio: '4/3', background: '#f9fafb', borderRadius: 8, border: '1px solid #eaecf0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: 12 }}>
                   {lokal.budynek?.logoUrl && (
-                    <div className="print-only" style={{ position: 'absolute', top: 18, left: 18, zIndex: 10, width: 135, height: 66 }}>
+                    <div className="print-only" style={{ position: 'absolute', top: 18, left: 18, zIndex: 10, width: 270, height: 132 }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={`${lokal.budynek.logoUrl}?auto=format&w=220`} alt="Logo inwestycji" style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'left top' }} />
                     </div>
@@ -577,7 +577,7 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
           .kl-params-basic .kl-param-item:last-child { border-right: none !important; }
 
           /* Tytuł "Karta lokalu X" wyśrodkowany niezależnie od szerokości nazwy budynku */
-          .kl-header       { position: relative !important; padding: 10px 28px !important; }
+          .kl-header       { position: relative !important; padding: 16px 28px !important; min-height: 66px !important; box-sizing: border-box !important; }
           .kl-header-title { position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; white-space: nowrap !important; }
 
           /* Zagęszczone odstępy, żeby całość zmieściła się na jednej stronie A4 poziomo */
@@ -585,7 +585,7 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
           .kl-param-item   { padding: 8px 20px !important; }
           .kl-main         { padding: 12px 28px 0 !important; gap: 16px !important; }
           .kl-footer       { margin: 10px 28px 0 !important; padding: 8px 14px !important; }
-          .kl-firm-footer  { margin: 10px 28px 10px !important; padding: 10px 14px !important; }
+          .kl-firm-footer  { margin: 10px 0 !important; padding: 16px 28px !important; border-radius: 0 !important; min-height: 66px !important; box-sizing: border-box !important; }
           .kl-rzut-kond    { margin-top: 6px !important; }
           .kl-rzut-kond-img { max-height: 110px !important; }
           .kl-oznaczenia-box { margin-top: 6px !important; padding: 6px 10px !important; gap: 4px !important; }
