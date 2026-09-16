@@ -7,4 +7,7 @@ import { defineCliConfig } from 'sanity/cli'
 export default defineCliConfig({
   api: { projectId: '9q753gf2', dataset: 'mieszkanie' },
   studioHost: 'matbet',
+  deployment: {
+    appId: 'k67zqca7n1pbees007w2et4w',
+  },
 })
