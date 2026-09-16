@@ -620,8 +620,8 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
           /* Rzut i legenda jedna pod drugą zamiast obok siebie — w pionie nie ma miejsca na dwie kolumny */
           .kl-main { grid-template-columns: 1fr !important; padding: 10px 18px 0 !important; gap: 10px !important; }
           .kl-has-pom .kl-rzut-col { display: block !important; }
-          .kl-rzut-img-wrap { flex-grow: 0 !important; aspect-ratio: 4/3 !important; max-height: 200px !important; width: auto !important; max-width: 280px !important; margin: 0 auto !important; }
-          .kl-logo-inwestycji { width: 140px !important; height: 68px !important; top: 8px !important; left: 8px !important; }
+          .kl-rzut-img-wrap { flex-grow: 0 !important; aspect-ratio: 4/3 !important; max-height: 340px !important; width: auto !important; max-width: 450px !important; margin: 0 auto !important; }
+          .kl-logo-inwestycji { width: 76px !important; height: 37px !important; top: 6px !important; left: 6px !important; }
 
           .kl-header      { padding: 10px 18px !important; min-height: 44px !important; }
           .kl-params-container { padding: 0 18px !important; }
