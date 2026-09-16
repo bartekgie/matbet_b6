@@ -326,7 +326,7 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
               {lokal.rzutUrl ? (
                 <div className="kl-rzut-img-wrap" style={{ position: 'relative', width: '100%', aspectRatio: '4/3', background: '#f9fafb', borderRadius: 8, overflow: 'hidden', border: '1px solid #eaecf0' }}>
                   {lokal.budynek?.logoUrl && (
-                    <div className="print-only" style={{ position: 'absolute', top: 8, left: 8, zIndex: 10, width: 90, height: 44 }}>
+                    <div className="print-only" style={{ position: 'absolute', top: 8, left: 8, zIndex: 10, width: 135, height: 66 }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={`${lokal.budynek.logoUrl}?auto=format&w=220`} alt="Logo inwestycji" style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'left top' }} />
                     </div>
@@ -353,7 +353,7 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
               ) : (
                 <div style={{ position: 'relative', aspectRatio: '4/3', background: '#f9fafb', borderRadius: 8, border: '1px solid #eaecf0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: 12 }}>
                   {lokal.budynek?.logoUrl && (
-                    <div className="print-only" style={{ position: 'absolute', top: 8, left: 8, zIndex: 10, width: 90, height: 44 }}>
+                    <div className="print-only" style={{ position: 'absolute', top: 8, left: 8, zIndex: 10, width: 135, height: 66 }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={`${lokal.budynek.logoUrl}?auto=format&w=220`} alt="Logo inwestycji" style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'left top' }} />
                     </div>
@@ -388,9 +388,9 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
 
                 {/* Rzut kondygnacji — pod legendą */}
                 {lokal.rzutKondygnacjiUrl && (
-                  <div style={{ marginTop: 16 }}>
+                  <div className="kl-rzut-kond" style={{ marginTop: 16 }}>
                     <div className="kl-leg-label" style={{ fontSize: 9, color: '#9ca3af', letterSpacing: 1.2, textTransform: 'uppercase', fontWeight: 700, marginBottom: 6 }}>Rzut kondygnacji</div>
-                    <div style={{ position: 'relative', width: '100%', aspectRatio: '4/3', background: '#f9fafb', borderRadius: 8, overflow: 'hidden', border: '1px solid #eaecf0' }}>
+                    <div className="kl-rzut-kond-img" style={{ position: 'relative', width: '100%', aspectRatio: '4/3', background: '#f9fafb', borderRadius: 8, overflow: 'hidden', border: '1px solid #eaecf0' }}>
                       <Image
                         src={`${lokal.rzutKondygnacjiUrl}?auto=format`}
                         alt="Rzut kondygnacji"
@@ -403,7 +403,7 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
                 )}
 
                 {/* Oznaczenia ścian — wypełnia resztę wysokości */}
-                <div style={{
+                <div className="kl-oznaczenia-box" style={{
                   flexGrow: 1,
                   marginTop: 16,
                   background: '#f8f9fb',
@@ -519,41 +519,6 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
         .km-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
         @media (max-width: 500px) { .km-grid { grid-template-columns: 1fr !important; } }
         .print-only { display: none; }
-        @media print {
-          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-          .no-print { display: none !important; }
-          .print-only { display: inline !important; }
-          nav        { display: none !important; }
-          footer     { display: none !important; }
-          main       { padding-top: 0 !important; background: #fff !important; }
-          html       { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-          body       { zoom: 0.85; margin: 0 !important; transform-origin: top left; }
-          @supports not (zoom: 1) {
-            body { transform: scale(0.85); width: calc(100% / 0.85); }
-          }
-          .kl-outer  { max-width: 100% !important; margin: 0 !important; padding: 0 4px !important; }
-          #karta-print {
-            box-shadow: none !important;
-            border-radius: 0 !important;
-            margin: 0 !important;
-            page-break-inside: avoid;
-          }
-          .kl-params-basic .kl-param-item:last-child { border-right: none !important; }
-          /* Czcionki +4px względem wersji ekranowej (desktop), dla czytelności w druku */
-          .kl-header-bldg     { font-size: 14px !important; }
-          .kl-header-title    { font-size: 26px !important; }
-          .kl-param-label     { font-size: 12px !important; }
-          .kl-param-val       { font-size: 20px !important; }
-          .kl-rzut-label      { font-size: 13px !important; }
-          .kl-leg-label       { font-size: 15px !important; }
-          .kl-leg-table       { font-size: 18px !important; }
-          .kl-leg-th          { font-size: 14px !important; }
-          .kl-leg-lp          { font-size: 17px !important; }
-          .kl-leg-wall-label  { font-size: 17px !important; }
-          .kl-disclaimer-text { font-size: 14px !important; }
-          .kl-firm-footer-info{ font-size: 15px !important; }
-          @page { size: A4 landscape; margin: 8mm; }
-        }
         @media (min-width: 769px) {
           .kl-has-pom { grid-template-columns: 1fr 252px !important; }
           .kl-has-pom .kl-rzut-col { display: flex; flex-direction: column; }
@@ -587,6 +552,62 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
           .kl-params-pricing .kl-param-item:first-child { border-right: 1px solid #dde1e7 !important; }
           .kl-firm-footer { flex-direction: column !important; align-items: center !important; text-align: center !important; margin: 12px 14px 14px !important; }
           .kl-firm-footer-info { justify-content: center !important; }
+        }
+        /* Blok @media print celowo na końcu arkusza — wygrywa w kaskadzie nad regułami
+           dla min-width:769px (te też są aktywne przy druku, bo strona A4 jest szersza niż 769px) */
+        @media print {
+          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+          .no-print { display: none !important; }
+          .print-only { display: inline !important; }
+          nav        { display: none !important; }
+          footer     { display: none !important; }
+          main       { padding-top: 0 !important; background: #fff !important; }
+          html       { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+          body       { zoom: 0.74; margin: 0 !important; transform-origin: top left; }
+          @supports not (zoom: 1) {
+            body { transform: scale(0.74); width: calc(100% / 0.74); }
+          }
+          .kl-outer  { max-width: 100% !important; margin: 0 !important; padding: 0 4px !important; }
+          #karta-print {
+            box-shadow: none !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            page-break-inside: avoid;
+          }
+          .kl-params-basic .kl-param-item:last-child { border-right: none !important; }
+
+          /* Tytuł "Karta lokalu X" wyśrodkowany niezależnie od szerokości nazwy budynku */
+          .kl-header       { position: relative !important; padding: 10px 28px !important; }
+          .kl-header-title { position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; white-space: nowrap !important; }
+
+          /* Zagęszczone odstępy, żeby całość zmieściła się na jednej stronie A4 poziomo */
+          .kl-params-container { padding: 0 28px !important; }
+          .kl-param-item   { padding: 8px 20px !important; }
+          .kl-main         { padding: 12px 28px 0 !important; gap: 16px !important; }
+          .kl-footer       { margin: 10px 28px 0 !important; padding: 8px 14px !important; }
+          .kl-firm-footer  { margin: 10px 28px 10px !important; padding: 10px 14px !important; }
+          .kl-rzut-kond    { margin-top: 6px !important; }
+          .kl-rzut-kond-img { max-height: 110px !important; }
+          .kl-oznaczenia-box { margin-top: 6px !important; padding: 6px 10px !important; gap: 4px !important; }
+          .kl-leg-table td, .kl-leg-table th { padding: 4px 10px !important; }
+
+          /* Rzut lokalu trochę mniejszy — nadal wypełnia dostępną wysokość (jak przy legendzie), ale węższy, żeby nie zostawiał pustej przestrzeni pod spodem */
+          .kl-rzut-img-wrap { max-width: 420px !important; }
+
+          /* Czcionki +4px względem wersji ekranowej (desktop), dla czytelności w druku */
+          .kl-header-bldg     { font-size: 14px !important; }
+          .kl-header-title    { font-size: 26px !important; }
+          .kl-param-label     { font-size: 12px !important; }
+          .kl-param-val       { font-size: 20px !important; }
+          .kl-rzut-label      { font-size: 13px !important; }
+          .kl-leg-label       { font-size: 15px !important; }
+          .kl-leg-table       { font-size: 18px !important; }
+          .kl-leg-th          { font-size: 14px !important; padding: 6px 10px !important; }
+          .kl-leg-lp          { font-size: 17px !important; }
+          .kl-leg-wall-label  { font-size: 17px !important; }
+          .kl-disclaimer-text { font-size: 14px !important; line-height: 1.5 !important; }
+          .kl-firm-footer-info{ font-size: 15px !important; }
+          @page { size: A4 landscape; margin: 8mm; }
         }
       `}</style>
     </main>
