@@ -24,6 +24,7 @@ export default {
     { name: 'liczbaLokali', title: 'Łączna liczba lokali', type: 'number' },
     { name: 'kondygnacje',  title: 'Liczba kondygnacji',   type: 'number' },
     { name: 'north',        title: 'Kompas północy',       type: 'image',  description: 'Obrazek ze strzałką / znakiem wskazującym kierunek północy dla tego budynku' },
+    { name: 'logoInwestycji', title: 'Logo inwestycji (karta lokalu do druku)', type: 'image', description: 'Wyświetlane w lewym górnym rogu rzutu mieszkania na karcie lokalu do druku (PDF)' },
     {
       name: 'cechy',
       title: 'Cechy inwestycji',

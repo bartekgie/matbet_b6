@@ -34,7 +34,7 @@ export const LOKAL_QUERY = `
     "rzutUrl": rzutB.asset->url,
     "rzutKondygnacjiUrl": rzutKondygnacji.asset->url,
     "zdjecia": zdjecia[].asset->url,
-    "budynek": budynek->{ nazwa, "slug": slug.current, "northUrl": north.asset->url }
+    "budynek": budynek->{ nazwa, "slug": slug.current, "northUrl": north.asset->url, "logoUrl": logoInwestycji.asset->url }
   }
 `
 

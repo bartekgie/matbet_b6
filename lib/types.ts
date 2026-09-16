@@ -50,5 +50,5 @@ export interface Lokal {
   rzutUrl?: string
   rzutKondygnacjiUrl?: string
   zdjecia?: string[]
-  budynek?: { nazwa: string; slug: string; northUrl?: string }
+  budynek?: { nazwa: string; slug: string; northUrl?: string; logoUrl?: string }
 }

@@ -190,7 +190,6 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
 
   const [wPorownaniu, setWPorownaniu] = useState(false)
   const [maxOsiagniete, setMaxOsiagniete] = useState(false)
-  const [printDate, setPrintDate] = useState('')
   const [showKontakt, setShowKontakt] = useState(false)
 
   useEffect(() => {
@@ -258,9 +257,10 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
               {lokal.budynek?.nazwa ?? ''}
             </div>
             <div className="kl-header-title" style={{ fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: 0.3 }}>
-              Lokal {lokal.nr}
+              <span className="no-print">Lokal {lokal.nr}</span>
+              <span className="print-only">Karta lokalu {lokal.nr}</span>
             </div>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: s.bg, color: s.text, padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
+            <span className="no-print" style={{ display: 'inline-flex', alignItems: 'center', gap: 5, background: s.bg, color: s.text, padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
               <span style={{ width: 5, height: 5, borderRadius: '50%', background: s.dot }} />
               {s.label}
             </span>
@@ -295,14 +295,14 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
                   padding: '12px 20px', textAlign: 'center', flexShrink: 0,
                   borderRight: '1px solid #dde1e7',
                 }}>
-                  <div style={{ fontSize: 8, color: '#9ca3af', letterSpacing: 1.2, textTransform: 'uppercase', fontWeight: 700, marginBottom: 3 }}>{label}</div>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: C.navy, whiteSpace: 'nowrap' }}>{val}</div>
+                  <div className="kl-param-label" style={{ fontSize: 8, color: '#9ca3af', letterSpacing: 1.2, textTransform: 'uppercase', fontWeight: 700, marginBottom: 3 }}>{label}</div>
+                  <div className="kl-param-val" style={{ fontSize: 16, fontWeight: 800, color: C.navy, whiteSpace: 'nowrap' }}>{val}</div>
                 </div>
               ))}
             </div>
-            {/* Ceny — desktop: inline po podstawowych, mobile: rząd 2 */}
+            {/* Ceny — desktop: inline po podstawowych, mobile: rząd 2. Ukryte w druku (karta PDF nie pokazuje cen). */}
             {statsPricing.length > 0 && (
-              <div className="kl-params-pricing" style={{ display: 'flex' }}>
+              <div className="kl-params-pricing no-print" style={{ display: 'flex' }}>
                 {statsPricing.map(({ label, val, gold }, i) => (
                   <div key={label} className="kl-param-item" style={{
                     padding: '12px 20px', textAlign: 'center', flexShrink: 0,
@@ -322,9 +322,15 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
 
             {/* Rzut mieszkania B */}
             <div className="kl-rzut-col">
-              <div style={{ fontSize: 9, color: '#9ca3af', letterSpacing: 1.2, textTransform: 'uppercase', fontWeight: 700, marginBottom: 8 }}>Rzut mieszkania</div>
+              <div className="kl-rzut-label" style={{ fontSize: 9, color: '#9ca3af', letterSpacing: 1.2, textTransform: 'uppercase', fontWeight: 700, marginBottom: 8 }}>Rzut mieszkania</div>
               {lokal.rzutUrl ? (
                 <div className="kl-rzut-img-wrap" style={{ position: 'relative', width: '100%', aspectRatio: '4/3', background: '#f9fafb', borderRadius: 8, overflow: 'hidden', border: '1px solid #eaecf0' }}>
+                  {lokal.budynek?.logoUrl && (
+                    <div className="print-only" style={{ position: 'absolute', top: 8, left: 8, zIndex: 10, width: 90, height: 44 }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={`${lokal.budynek.logoUrl}?auto=format&w=220`} alt="Logo inwestycji" style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'left top' }} />
+                    </div>
+                  )}
                   <Image
                     src={`${lokal.rzutUrl}?auto=format`}
                     alt="Rzut mieszkania"
@@ -345,7 +351,13 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
                   )}
                 </div>
               ) : (
-                <div style={{ aspectRatio: '4/3', background: '#f9fafb', borderRadius: 8, border: '1px solid #eaecf0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: 12 }}>
+                <div style={{ position: 'relative', aspectRatio: '4/3', background: '#f9fafb', borderRadius: 8, border: '1px solid #eaecf0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: 12 }}>
+                  {lokal.budynek?.logoUrl && (
+                    <div className="print-only" style={{ position: 'absolute', top: 8, left: 8, zIndex: 10, width: 90, height: 44 }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={`${lokal.budynek.logoUrl}?auto=format&w=220`} alt="Logo inwestycji" style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'left top' }} />
+                    </div>
+                  )}
                   Rzut zostanie dodany wkrótce
                 </div>
               )}
@@ -420,7 +432,7 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
 
           {/* Stopka z zastrzeżeniami */}
           <div className="kl-footer" style={{ margin: '16px 28px 0', padding: '12px 16px', background: '#f8f9fb', borderRadius: 8, borderLeft: `3px solid #dde1e7` }}>
-            <p style={{ fontSize: 10, color: '#9ca3af', lineHeight: 1.8, margin: 0 }}>
+            <p className="kl-disclaimer-text" style={{ fontSize: 10, color: '#9ca3af', lineHeight: 1.8, margin: 0 }}>
               Powierzchnię użytkową obliczono wg PN-ISO 9836-1997.<br />
               Projekt wykonawczy może wprowadzić zmiany.<br />
               Aranżacja pomieszczeń nie stanowi oferty handlowej w rozumieniu przepisów prawa, ma jedynie charakter poglądowy.
@@ -450,13 +462,6 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
               <span>matbet.com.pl</span>
             </div>
           </div>
-
-          {/* Data wydruku — widoczna tylko w druku */}
-          {printDate && (
-            <div className="kl-print-date" style={{ display: 'none', margin: '0 28px 8px', padding: '6px 0', borderTop: '1px solid rgba(27,45,79,0.15)', fontSize: 10, color: '#9ca3af', textAlign: 'right' }}>
-              Data wydruku: {printDate}
-            </div>
-          )}
 
         </div>
 
@@ -488,10 +493,8 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
           </button>
           <button
             onClick={() => {
-              const d = new Intl.DateTimeFormat('pl-PL', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date())
-              setPrintDate(d)
               const prev = document.title
-              document.title = `Lokal ${lokal.nr} - Osiedle Nowe Miasto - Budynek B6`
+              document.title = `Karta lokalu ${lokal.nr} - Osiedle Nowe Miasto${lokal.budynek?.nazwa ? ` - ${lokal.budynek.nazwa}` : ''}`
               window.addEventListener('afterprint', () => { document.title = prev }, { once: true })
               setTimeout(() => window.print(), 50)
             }}
@@ -515,16 +518,18 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
         .kl-porownaj-btn:hover { transform: translateY(-1px); }
         .km-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
         @media (max-width: 500px) { .km-grid { grid-template-columns: 1fr !important; } }
+        .print-only { display: none; }
         @media print {
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
           .no-print { display: none !important; }
+          .print-only { display: inline !important; }
           nav        { display: none !important; }
           footer     { display: none !important; }
           main       { padding-top: 0 !important; background: #fff !important; }
           html       { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-          body       { zoom: 0.72; margin: 0 !important; transform-origin: top left; }
+          body       { zoom: 0.85; margin: 0 !important; transform-origin: top left; }
           @supports not (zoom: 1) {
-            body { transform: scale(0.72); width: calc(100% / 0.72); }
+            body { transform: scale(0.85); width: calc(100% / 0.85); }
           }
           .kl-outer  { max-width: 100% !important; margin: 0 !important; padding: 0 4px !important; }
           #karta-print {
@@ -533,7 +538,20 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
             margin: 0 !important;
             page-break-inside: avoid;
           }
-          .kl-print-date { display: block !important; }
+          .kl-params-basic .kl-param-item:last-child { border-right: none !important; }
+          /* Czcionki +4px względem wersji ekranowej (desktop), dla czytelności w druku */
+          .kl-header-bldg     { font-size: 14px !important; }
+          .kl-header-title    { font-size: 26px !important; }
+          .kl-param-label     { font-size: 12px !important; }
+          .kl-param-val       { font-size: 20px !important; }
+          .kl-rzut-label      { font-size: 13px !important; }
+          .kl-leg-label       { font-size: 15px !important; }
+          .kl-leg-table       { font-size: 18px !important; }
+          .kl-leg-th          { font-size: 14px !important; }
+          .kl-leg-lp          { font-size: 17px !important; }
+          .kl-leg-wall-label  { font-size: 17px !important; }
+          .kl-disclaimer-text { font-size: 14px !important; }
+          .kl-firm-footer-info{ font-size: 15px !important; }
           @page { size: A4 landscape; margin: 8mm; }
         }
         @media (min-width: 769px) {
