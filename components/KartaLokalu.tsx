@@ -571,9 +571,9 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
           footer     { display: none !important; }
           main       { padding-top: 0 !important; background: #fff !important; }
           html       { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-          body       { zoom: 0.74; margin: 0 !important; transform-origin: top left; }
+          body       { zoom: 0.80; margin: 0 !important; transform-origin: top left; }
           @supports not (zoom: 1) {
-            body { transform: scale(0.74); width: calc(100% / 0.74); }
+            body { transform: scale(0.80); width: calc(100% / 0.80); }
           }
           .kl-outer  { max-width: 100% !important; margin: 0 !important; padding: 0 4px !important; }
           #karta-print {
@@ -613,7 +613,7 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
           .kl-leg-wall-label  { font-size: 17px !important; }
           .kl-disclaimer-text { font-size: 14px !important; line-height: 1.5 !important; }
           .kl-firm-footer-info{ font-size: 15px !important; }
-          @page { size: A4 landscape; margin: 8mm; }
+          @page { size: A4 landscape; margin: 4mm; }
         }
         /* Wersja mobilna karty PDF. UWAGA: to NIE jest warunkowane orientacją strony
            (@media orientation:portrait) — próbowaliśmy tak wcześniej, ale okazało się
@@ -625,9 +625,9 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
            na tej podstawie dodaje klasę .kl-print-mobile na <html> PRZED wywołaniem
            window.print() — więc to urządzenie decyduje, nie orientacja wydruku. */
         @media print {
-          html.kl-print-mobile body { zoom: 0.86 !important; }
+          html.kl-print-mobile body { zoom: 0.97 !important; }
           @supports not (zoom: 1) {
-            html.kl-print-mobile body { transform: scale(0.86) !important; width: calc(100% / 0.86) !important; }
+            html.kl-print-mobile body { transform: scale(0.97) !important; width: calc(100% / 0.97) !important; }
           }
           /* Rzut i legenda jedna pod drugą zamiast obok siebie — w pionie nie ma miejsca na dwie kolumny */
           html.kl-print-mobile .kl-main { grid-template-columns: 1fr !important; padding: 10px 18px 0 !important; gap: 10px !important; }
