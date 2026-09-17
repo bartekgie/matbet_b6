@@ -574,7 +574,13 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
           /* transform:scale zamiast zoom - zoom ma niespojna historie wsparcia miedzy
              przegladarkami/silnikami (zwlaszcza Safari/WebKit), transform jest wspierany
              wszedzie identycznie i tak samo skaluje elementy position:absolute w srodku. */
-          body       { transform: scale(0.72); transform-origin: top left; width: calc(100% / 0.72); margin: 0 !important; }
+          /* zoom (nie transform!) - zoom pomniejsza UKLAD, wiec przegladarka dzieli na strony
+             juz pomniejszona karte. transform:scale pomniejsza tylko obraz, a paginacja idzie
+             po niepomniejszonym ukladzie -> pusta/nadmiarowa druga strona (blad z 17.09). */
+          body       { zoom: 0.72; margin: 0 !important; }
+          @supports not (zoom: 1) {
+            body { transform: scale(0.72); transform-origin: top left; width: calc(100% / 0.72); }
+          }
           .kl-outer  { max-width: 100% !important; margin: 0 !important; padding: 0 22px !important; }
           #karta-print {
             box-shadow: none !important;
@@ -625,12 +631,15 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
            na tej podstawie dodaje klasę .kl-print-mobile na <html> PRZED wywołaniem
            window.print() — więc to urządzenie decyduje, nie orientacja wydruku. */
         @media print {
-          html.kl-print-mobile body { transform: scale(0.84) !important; transform-origin: top left !important; width: calc(100% / 0.84) !important; }
+          html.kl-print-mobile body { zoom: 0.84 !important; }
+          @supports not (zoom: 1) {
+            html.kl-print-mobile body { transform: scale(0.84) !important; transform-origin: top left !important; width: calc(100% / 0.84) !important; }
+          }
           /* Rzut i legenda jedna pod drugą zamiast obok siebie — w pionie nie ma miejsca na dwie kolumny */
           html.kl-print-mobile .kl-main { grid-template-columns: 1fr !important; padding: 10px 18px 0 !important; gap: 10px !important; }
           html.kl-print-mobile .kl-has-pom .kl-rzut-col { display: block !important; }
           html.kl-print-mobile .kl-rzut-img-wrap { flex-grow: 0 !important; aspect-ratio: 4/3 !important; max-height: 340px !important; width: auto !important; max-width: 450px !important; margin: 0 auto !important; }
-          html.kl-print-mobile .kl-logo-inwestycji { width: 76px !important; height: 37px !important; top: 6px !important; left: 6px !important; }
+          html.kl-print-mobile .kl-logo-inwestycji { width: 38px !important; height: 18px !important; top: 6px !important; left: 6px !important; }
 
           html.kl-print-mobile .kl-header      { padding: 10px 18px !important; min-height: 44px !important; }
           html.kl-print-mobile .kl-params-container { padding: 0 18px !important; }
