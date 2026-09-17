@@ -326,7 +326,7 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
               {lokal.rzutUrl ? (
                 <div className="kl-rzut-img-wrap" style={{ position: 'relative', width: '100%', aspectRatio: '4/3', background: '#f9fafb', borderRadius: 8, overflow: 'hidden', border: '1px solid #eaecf0' }}>
                   {lokal.budynek?.logoUrl && (
-                    <div className="print-only kl-logo-inwestycji" style={{ position: 'absolute', top: 18, left: 18, zIndex: 10, width: 270, height: 132 }}>
+                    <div className="print-only kl-logo-inwestycji" style={{ position: 'absolute', top: 18, left: 18, zIndex: 10, width: 270, height: 132, background: 'rgba(255,255,255,0.94)', borderRadius: 8, padding: 6, boxSizing: 'border-box', boxShadow: '0 1px 4px rgba(0,0,0,0.18)' }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={`${lokal.budynek.logoUrl}?auto=format&w=220`} alt="Logo inwestycji" style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'left top' }} />
                     </div>
@@ -353,7 +353,7 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
               ) : (
                 <div style={{ position: 'relative', aspectRatio: '4/3', background: '#f9fafb', borderRadius: 8, border: '1px solid #eaecf0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', fontSize: 12 }}>
                   {lokal.budynek?.logoUrl && (
-                    <div className="print-only kl-logo-inwestycji" style={{ position: 'absolute', top: 18, left: 18, zIndex: 10, width: 270, height: 132 }}>
+                    <div className="print-only kl-logo-inwestycji" style={{ position: 'absolute', top: 18, left: 18, zIndex: 10, width: 270, height: 132, background: 'rgba(255,255,255,0.94)', borderRadius: 8, padding: 6, boxSizing: 'border-box', boxShadow: '0 1px 4px rgba(0,0,0,0.18)' }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={`${lokal.budynek.logoUrl}?auto=format&w=220`} alt="Logo inwestycji" style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'left top' }} />
                     </div>
@@ -571,10 +571,10 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
           footer     { display: none !important; }
           main       { padding-top: 0 !important; background: #fff !important; }
           html       { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-          body       { zoom: 0.80; margin: 0 !important; transform-origin: top left; }
-          @supports not (zoom: 1) {
-            body { transform: scale(0.80); width: calc(100% / 0.80); }
-          }
+          /* transform:scale zamiast zoom - zoom ma niespojna historie wsparcia miedzy
+             przegladarkami/silnikami (zwlaszcza Safari/WebKit), transform jest wspierany
+             wszedzie identycznie i tak samo skaluje elementy position:absolute w srodku. */
+          body       { transform: scale(0.80); transform-origin: top left; width: calc(100% / 0.80); margin: 0 !important; }
           .kl-outer  { max-width: 100% !important; margin: 0 !important; padding: 0 4px !important; }
           #karta-print {
             box-shadow: none !important;
@@ -625,10 +625,7 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
            na tej podstawie dodaje klasę .kl-print-mobile na <html> PRZED wywołaniem
            window.print() — więc to urządzenie decyduje, nie orientacja wydruku. */
         @media print {
-          html.kl-print-mobile body { zoom: 0.97 !important; }
-          @supports not (zoom: 1) {
-            html.kl-print-mobile body { transform: scale(0.97) !important; width: calc(100% / 0.97) !important; }
-          }
+          html.kl-print-mobile body { transform: scale(0.97) !important; transform-origin: top left !important; width: calc(100% / 0.97) !important; }
           /* Rzut i legenda jedna pod drugą zamiast obok siebie — w pionie nie ma miejsca na dwie kolumny */
           html.kl-print-mobile .kl-main { grid-template-columns: 1fr !important; padding: 10px 18px 0 !important; gap: 10px !important; }
           html.kl-print-mobile .kl-has-pom .kl-rzut-col { display: block !important; }
