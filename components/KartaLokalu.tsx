@@ -495,7 +495,15 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
             onClick={() => {
               const prev = document.title
               document.title = `Karta lokalu ${lokal.nr} - Osiedle Nowe Miasto${lokal.budynek?.nazwa ? ` - ${lokal.budynek.nazwa}` : ''}`
-              window.addEventListener('afterprint', () => { document.title = prev }, { once: true })
+              // Rozpoznajemy mobile po realnej szerokości ekranu urządzenia (nie po
+              // orientacji wydruku - ta bywa myląca, np. Chrome na Windows potrafi
+              // wystartować w pionie z przyczyn niezwiązanych z urządzeniem).
+              const isMobile = window.innerWidth <= 768
+              document.documentElement.classList.toggle('kl-print-mobile', isMobile)
+              window.addEventListener('afterprint', () => {
+                document.title = prev
+                document.documentElement.classList.remove('kl-print-mobile')
+              }, { once: true })
               setTimeout(() => window.print(), 50)
             }}
             className="kl-btn"
@@ -517,7 +525,7 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
         .kl-porownaj-btn { transition: background 0.15s, transform 0.15s; }
         .kl-porownaj-btn:hover { transform: translateY(-1px); }
         .km-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-        @media (max-width: 500px) { .km-grid { grid-template-columns: 1fr !important; } }
+        @media screen and (max-width: 500px) { .km-grid { grid-template-columns: 1fr !important; } }
         .print-only { display: none; }
         @media (min-width: 769px) {
           .kl-has-pom { grid-template-columns: 1fr 252px !important; }
@@ -530,7 +538,7 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
           .kl-leg-wall-img  { width: 38px !important; height: 19px !important; }
           .kl-leg-wall-label{ font-size: 13px !important; }
         }
-        @media (max-width: 768px) {
+        @media screen and (max-width: 768px) {
           main { padding-top: 80px !important; }
           .kl-outer { padding: 0 10px 20px !important; margin: 10px auto !important; }
           .kl-header { padding: 10px 14px !important; flex-wrap: wrap; gap: 6px 10px; }
@@ -607,45 +615,49 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
           .kl-firm-footer-info{ font-size: 15px !important; }
           @page { size: A4 landscape; margin: 8mm; }
         }
-        /* Wersja mobilna karty PDF — telefony przy druku/zapisie do PDF czesto
-           ignoruja @page landscape i tak czy inaczej renderuja w pionie. Ten blok
-           dotyczy WYLACZNIE tego przypadku (wykrywany przez orientation:portrait,
-           niezaleznie od urzadzenia) i NIE dotyka niczego z wersji poziomej powyzej. */
-        @media print and (orientation: portrait) {
-          @page { size: A4 portrait; margin: 8mm; }
-          body { zoom: 0.86 !important; }
+        /* Wersja mobilna karty PDF. UWAGA: to NIE jest warunkowane orientacją strony
+           (@media orientation:portrait) — próbowaliśmy tak wcześniej, ale okazało się
+           zawodne: orientacja wydruku bywa "pionowa" też na desktopie (np. Chrome na
+           Windows potrafi tak wystartować z przyczyn niezwiązanych z urządzeniem),
+           więc desktop przypadkiem dostawał układ mobilny. Zamiast tego: JS w
+           przycisku "Zobacz kartę PDF" sprawdza realną szerokość ekranu urządzenia
+           (window.innerWidth <= 768, ten sam próg co reszta komponentu) i dopiero
+           na tej podstawie dodaje klasę .kl-print-mobile na <html> PRZED wywołaniem
+           window.print() — więc to urządzenie decyduje, nie orientacja wydruku. */
+        @media print {
+          html.kl-print-mobile body { zoom: 0.86 !important; }
           @supports not (zoom: 1) {
-            body { transform: scale(0.86) !important; width: calc(100% / 0.86) !important; }
+            html.kl-print-mobile body { transform: scale(0.86) !important; width: calc(100% / 0.86) !important; }
           }
           /* Rzut i legenda jedna pod drugą zamiast obok siebie — w pionie nie ma miejsca na dwie kolumny */
-          .kl-main { grid-template-columns: 1fr !important; padding: 10px 18px 0 !important; gap: 10px !important; }
-          .kl-has-pom .kl-rzut-col { display: block !important; }
-          .kl-rzut-img-wrap { flex-grow: 0 !important; aspect-ratio: 4/3 !important; max-height: 340px !important; width: auto !important; max-width: 450px !important; margin: 0 auto !important; }
-          .kl-logo-inwestycji { width: 76px !important; height: 37px !important; top: 6px !important; left: 6px !important; }
+          html.kl-print-mobile .kl-main { grid-template-columns: 1fr !important; padding: 10px 18px 0 !important; gap: 10px !important; }
+          html.kl-print-mobile .kl-has-pom .kl-rzut-col { display: block !important; }
+          html.kl-print-mobile .kl-rzut-img-wrap { flex-grow: 0 !important; aspect-ratio: 4/3 !important; max-height: 340px !important; width: auto !important; max-width: 450px !important; margin: 0 auto !important; }
+          html.kl-print-mobile .kl-logo-inwestycji { width: 76px !important; height: 37px !important; top: 6px !important; left: 6px !important; }
 
-          .kl-header      { padding: 10px 18px !important; min-height: 44px !important; }
-          .kl-params-container { padding: 0 18px !important; }
-          .kl-param-item  { padding: 6px 12px !important; }
-          .kl-footer      { margin: 8px 18px 0 !important; padding: 6px 12px !important; }
-          .kl-firm-footer { padding: 10px 18px !important; min-height: 44px !important; margin: 8px 0 !important; }
-          .kl-rzut-kond   { margin-top: 4px !important; }
-          .kl-rzut-kond-img { max-height: 90px !important; }
-          .kl-oznaczenia-box { margin-top: 4px !important; padding: 5px 10px !important; gap: 3px !important; }
-          .kl-leg-table td, .kl-leg-table th { padding: 3px 10px !important; }
+          html.kl-print-mobile .kl-header      { padding: 10px 18px !important; min-height: 44px !important; }
+          html.kl-print-mobile .kl-params-container { padding: 0 18px !important; }
+          html.kl-print-mobile .kl-param-item  { padding: 6px 12px !important; }
+          html.kl-print-mobile .kl-footer      { margin: 8px 18px 0 !important; padding: 6px 12px !important; }
+          html.kl-print-mobile .kl-firm-footer { padding: 10px 18px !important; min-height: 44px !important; margin: 8px 0 !important; }
+          html.kl-print-mobile .kl-rzut-kond   { margin-top: 4px !important; }
+          html.kl-print-mobile .kl-rzut-kond-img { max-height: 90px !important; }
+          html.kl-print-mobile .kl-oznaczenia-box { margin-top: 4px !important; padding: 5px 10px !important; gap: 3px !important; }
+          html.kl-print-mobile .kl-leg-table td, html.kl-print-mobile .kl-leg-table th { padding: 3px 10px !important; }
 
           /* Mniejsze czcionki niz w wersji poziomej - w pionie mniej miejsca na szerokosc */
-          .kl-header-bldg     { font-size: 11px !important; }
-          .kl-header-title    { font-size: 20px !important; }
-          .kl-param-label     { font-size: 10px !important; }
-          .kl-param-val       { font-size: 16px !important; }
-          .kl-rzut-label      { font-size: 11px !important; }
-          .kl-leg-label       { font-size: 12px !important; }
-          .kl-leg-table       { font-size: 14px !important; }
-          .kl-leg-th          { font-size: 11px !important; padding: 4px 10px !important; }
-          .kl-leg-lp          { font-size: 13px !important; }
-          .kl-leg-wall-label  { font-size: 13px !important; }
-          .kl-disclaimer-text { font-size: 11px !important; line-height: 1.4 !important; }
-          .kl-firm-footer-info{ font-size: 12px !important; }
+          html.kl-print-mobile .kl-header-bldg     { font-size: 11px !important; }
+          html.kl-print-mobile .kl-header-title    { font-size: 20px !important; }
+          html.kl-print-mobile .kl-param-label     { font-size: 10px !important; }
+          html.kl-print-mobile .kl-param-val       { font-size: 16px !important; }
+          html.kl-print-mobile .kl-rzut-label      { font-size: 11px !important; }
+          html.kl-print-mobile .kl-leg-label       { font-size: 12px !important; }
+          html.kl-print-mobile .kl-leg-table       { font-size: 14px !important; }
+          html.kl-print-mobile .kl-leg-th          { font-size: 11px !important; padding: 4px 10px !important; }
+          html.kl-print-mobile .kl-leg-lp          { font-size: 13px !important; }
+          html.kl-print-mobile .kl-leg-wall-label  { font-size: 13px !important; }
+          html.kl-print-mobile .kl-disclaimer-text { font-size: 11px !important; line-height: 1.4 !important; }
+          html.kl-print-mobile .kl-firm-footer-info{ font-size: 12px !important; }
         }
       `}</style>
     </main>
