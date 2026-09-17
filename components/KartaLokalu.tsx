@@ -570,6 +570,14 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
           nav        { display: none !important; }
           footer     { display: none !important; }
           main       { padding-top: 0 !important; background: #fff !important; }
+          /* Desktop: karta wysrodkowana w pionie na stronie A4 poziomo. Wysokosc strony
+             (210mm - 2x4mm marginesu = 202mm) podzielona przez zoom, bo main zyje wewnatrz
+             body { zoom: 0.72 }. 198mm zamiast 202mm = 4mm luzu, zeby zaokraglenia nigdy
+             nie dolozyly 2. strony. Mobile (html.kl-print-mobile) celowo pominiete. */
+          html:not(.kl-print-mobile) main {
+            display: flex !important; flex-direction: column !important; justify-content: center !important;
+            min-height: calc(198mm / 0.72) !important; box-sizing: border-box !important;
+          }
           html       { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
           /* transform:scale zamiast zoom - zoom ma niespojna historie wsparcia miedzy
              przegladarkami/silnikami (zwlaszcza Safari/WebKit), transform jest wspierany
