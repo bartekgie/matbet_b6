@@ -74,6 +74,7 @@ export default {
             options: {
               list: [
                 { title: 'Pokój',                    value: 'Pokój' },
+                { title: 'Salon',                     value: 'Salon' },
                 { title: 'Salon z aneksem kuchennym', value: 'Salon z aneksem kuchennym' },
                 { title: 'Kuchnia',                  value: 'Kuchnia' },
                 { title: 'Łazienka',                 value: 'Łazienka' },
