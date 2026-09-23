@@ -1,3 +1,18 @@
+export interface MiejsceWOkolicy {
+  ikona: string
+  nazwa: string
+  odleglosc: string
+}
+
+export interface Osiedle {
+  nazwa: string
+  miasto?: string
+  adres?: string
+  googleMapsUrl?: string
+  streetViewEmbedUrl?: string
+  miejscaWOkolicy?: MiejsceWOkolicy[]
+}
+
 export interface Budynek {
   _id: string
   nazwa: string
@@ -13,6 +28,7 @@ export interface Budynek {
   liczbaLokali?: number
   kondygnacje?: number
   cechy?: Cecha[]
+  osiedle?: Osiedle
 }
 
 export interface GaleriaItem {
@@ -50,5 +66,5 @@ export interface Lokal {
   rzutUrl?: string
   rzutKondygnacjiUrl?: string
   zdjecia?: string[]
-  budynek?: { nazwa: string; slug: string; northUrl?: string; logoUrl?: string }
+  budynek?: { nazwa: string; slug: string; northUrl?: string; logoUrl?: string; osiedle?: { nazwa: string; miasto?: string } }
 }

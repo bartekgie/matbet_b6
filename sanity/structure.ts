@@ -11,6 +11,19 @@ export const structure: StructureResolver = (S, context) => {
     .title('Matbet CMS')
     .items([
 
+      // ── OSIEDLA (tylko admin) ────────────────────────────────────────────────
+      ...(isAdmin ? [
+        S.listItem()
+          .title('Osiedla')
+          .schemaType('osiedle')
+          .child(
+            S.documentTypeList('osiedle')
+              .title('Osiedla')
+              .defaultOrdering([{ field: 'nazwa', direction: 'asc' }])
+          ),
+        S.divider(),
+      ] : []),
+
       // ── BUDYNKI (tylko admin) ────────────────────────────────────────────────
       ...(isAdmin ? [
         S.listItem()

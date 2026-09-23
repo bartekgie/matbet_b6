@@ -15,14 +15,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const budynek = await client.fetch(BUDYNEK_QUERY, { slug })
   if (!budynek) return {}
 
-  const title = `${budynek.nazwa} – Osiedle Nowe Miasto Słupsk`
-  const description = `${budynek.nazwa} to nowoczesna inwestycja dewelopera Matbet w Słupsku. ${budynek.liczbaLokali ? `${budynek.liczbaLokali} lokali` : 'Lokale'} na sprzedaż w Osiedlu Nowe Miasto. ${budynek.adres ?? ''}`.trim()
+  const osiedleNazwa = budynek.osiedle?.nazwa ?? 'Matbet'
+  const miasto       = budynek.osiedle?.miasto ?? ''
+  const miejsce      = [osiedleNazwa, miasto].filter(Boolean).join(' ')
+
+  const title = `${budynek.nazwa} – ${miejsce}`
+  const description = `${budynek.nazwa} to nowoczesna inwestycja dewelopera Matbet${miasto ? ` w ${miasto}` : ''}. ${budynek.liczbaLokali ? `${budynek.liczbaLokali} lokali` : 'Lokale'} na sprzedaż${osiedleNazwa ? ` w ${osiedleNazwa}` : ''}. ${budynek.adres ?? ''}`.trim()
   const url = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://nowemiasto.matbet.com.pl'}/budynek/${slug}`
 
   return {
     title,
     description,
-    keywords: [`${budynek.nazwa} Słupsk`, 'mieszkania Słupsk', 'Osiedle Nowe Miasto Słupsk', 'Matbet deweloper', 'nowe mieszkania Słupsk'],
+    keywords: [`${budynek.nazwa}${miasto ? ` ${miasto}` : ''}`, miasto ? `mieszkania ${miasto}` : 'mieszkania', `deweloper ${miasto}`.trim(), 'Matbet deweloper', miejsce].filter(Boolean),
     alternates: { canonical: url },
     openGraph: {
       title,
@@ -48,16 +52,23 @@ export default async function BudynekPage({ params }: { params: Promise<{ slug: 
   if (!budynek) notFound()
 
   const lokale = await client.fetch(LOKALE_BUDYNKU_QUERY, { budynekId: budynek._id })
+  const osiedleNazwa  = budynek.osiedle?.nazwa
+  const osiedleMiasto = budynek.osiedle?.miasto
 
   return (
     <>
-      <Navbar budynekNazwa={budynek.nazwa} />
+      <Navbar budynekNazwa={budynek.nazwa} osiedleNazwa={osiedleNazwa} />
       <main>
         <HeroSection budynek={budynek} wolneLokali={lokale.filter((l: { status: string }) => l.status === 'wolne').length} />
-        <WyszukiwarkaSection lokale={lokale} budynekNazwa={budynek.nazwa} />
+        <WyszukiwarkaSection lokale={lokale} budynekNazwa={budynek.nazwa} osiedleNazwa={osiedleNazwa} osiedleMiasto={osiedleMiasto} />
         <InwestycjaSection budynek={budynek} />
-        <GaleriaSection galeria={budynek.galeria ?? []} />
-        <MapaSection lat={budynek.lat} lng={budynek.lng} adres={budynek.adres} />
+        <GaleriaSection galeria={budynek.galeria ?? []} osiedleNazwa={osiedleNazwa} />
+        <MapaSection
+          adres={budynek.osiedle?.adres}
+          googleMapsUrl={budynek.osiedle?.googleMapsUrl}
+          streetViewEmbedUrl={budynek.osiedle?.streetViewEmbedUrl}
+          miejsca={budynek.osiedle?.miejscaWOkolicy}
+        />
         <FormularzSection budynekNazwa={budynek.nazwa} />
       </main>
       <Footer />

@@ -18,11 +18,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://nowemiasto.matbet.com.pl'),
   icons: { icon: '/favicon.png' },
   title: {
-    default: 'Matbet Deweloper – Osiedle Nowe Miasto Słupsk',
+    default: 'Matbet Deweloper – nowe mieszkania na sprzedaż',
     template: '%s | Matbet',
   },
-  description: 'Matbet – deweloper mieszkaniowy ze Słupska. Nowe mieszkania na sprzedaż w Osiedlu Nowe Miasto. Sprawdź dostępne lokale i skontaktuj się z nami.',
-  keywords: ['mieszkania Słupsk', 'nowe mieszkania Słupsk', 'deweloper Słupsk', 'Matbet', 'Osiedle Nowe Miasto Słupsk', 'lokale na sprzedaż Słupsk'],
+  description: 'Matbet – deweloper mieszkaniowy. Nowe mieszkania na sprzedaż w naszych inwestycjach. Sprawdź dostępne lokale i skontaktuj się z nami.',
+  keywords: ['mieszkania na sprzedaż', 'nowe mieszkania', 'deweloper', 'Matbet', 'lokale na sprzedaż'],
   authors: [{ name: 'Matbet sp. z o.o.' }],
   robots: { index: true, follow: true },
   openGraph: {

@@ -85,9 +85,11 @@ export default function HeroSection({ budynek, wolneLokali }: { budynek: Budynek
         maxWidth: 900,
         margin: '0 auto',
       }}>
-        <p className="hero-location" style={{ letterSpacing: 3, color: COLORS.text, marginBottom: 16, textTransform: 'uppercase', opacity: 0.7 }}>
-          Osiedle Nowe Miasto • Słupsk
-        </p>
+        {(budynek.osiedle?.nazwa || budynek.osiedle?.miasto) && (
+          <p className="hero-location" style={{ letterSpacing: 3, color: COLORS.text, marginBottom: 16, textTransform: 'uppercase', opacity: 0.7 }}>
+            {[budynek.osiedle?.nazwa, budynek.osiedle?.miasto].filter(Boolean).join(' • ')}
+          </p>
+        )}
 
         <h1 className="hero-title" style={{ fontWeight: 800, color: COLORS.text, lineHeight: 1.1, marginBottom: 16 }}>
           {budynek.nazwa}

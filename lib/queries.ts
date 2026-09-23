@@ -11,7 +11,11 @@ export const BUDYNEK_QUERY = `
       "lqip": asset->metadata.lqip,
       alt
     },
-    "cechy": cechy[]{ tytul, opis, "ikonaUrl": ikona.asset->url }
+    "cechy": cechy[]{ tytul, opis, "ikonaUrl": ikona.asset->url },
+    "osiedle": osiedle->{
+      nazwa, miasto, adres, googleMapsUrl, streetViewEmbedUrl,
+      "miejscaWOkolicy": miejscaWOkolicy[]{ ikona, nazwa, odleglosc }
+    }
   }
 `
 
@@ -34,13 +38,17 @@ export const LOKAL_QUERY = `
     "rzutUrl": rzutB.asset->url,
     "rzutKondygnacjiUrl": rzutKondygnacji.asset->url,
     "zdjecia": zdjecia[].asset->url,
-    "budynek": budynek->{ nazwa, "slug": slug.current, "northUrl": north.asset->url, "logoUrl": logoInwestycji.asset->url }
+    "budynek": budynek->{
+      nazwa, "slug": slug.current, "northUrl": north.asset->url, "logoUrl": logoInwestycji.asset->url,
+      "osiedle": osiedle->{ nazwa, miasto }
+    }
   }
 `
 
-// Query dla nawigacji — lista wszystkich budynków
+// Query dla nawigacji — lista wszystkich budynków, pogrupowana po osiedlu
 export const WSZYSTKIE_BUDYNKI_QUERY = `
   *[_type == "budynek"] | order(nazwa asc) {
-    _id, nazwa, "slug": slug.current
+    _id, nazwa, "slug": slug.current,
+    "osiedle": osiedle->{ _id, nazwa }
   }
 `

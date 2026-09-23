@@ -22,29 +22,18 @@ const ICONS: Record<string, React.ReactElement> = {
   loop:     <svg width={S} height={S} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>,
 }
 
-const MIEJSCA = [
-  { ikona: ICONS.beach,    nazwa: 'Ustka',             odl: '18 km'  },
-  { ikona: ICONS.atm,      nazwa: 'Bankomat',           odl: '400 m'  },
-  { ikona: ICONS.cart,     nazwa: 'Supermarket',        odl: '400 m'  },
-  { ikona: ICONS.train,    nazwa: 'Stacja kolejowa',    odl: '4 km'   },
-  { ikona: ICONS.plane,    nazwa: 'Lotnisko',           odl: '120 km' },
-  { ikona: ICONS.school,   nazwa: 'Szkoły',             odl: '200 m'  },
-  { ikona: ICONS.hospital, nazwa: 'Szpital',            odl: '3,5 km' },
-  { ikona: ICONS.bus,      nazwa: 'Przystanek',         odl: '100 m'  },
-  { ikona: ICONS.tree,     nazwa: 'Park Zachodni',      odl: '500 m'  },
-  { ikona: ICONS.loop,     nazwa: 'Pętla autobusowa',   odl: '900 m'  },
-]
-
-const STREET_VIEW_SRC = 'https://www.google.com/maps/embed?pb=!4v1776367986058!6m8!1m7!1sAErv5rsj5UU4tqp3WDf40w!2m2!1d54.46536378406788!2d16.98121339286148!3f295.57545326196043!4f-1.7544951324730391!5f0.7820865974627469'
-const GMAPS_URL        = 'https://maps.app.goo.gl/xQP8FjLKFMRYDA2AA'
-
 export default function MapaSection({
   adres,
+  googleMapsUrl,
+  streetViewEmbedUrl,
+  miejsca,
 }: {
-  lat?: number
-  lng?: number
   adres?: string
+  googleMapsUrl?: string
+  streetViewEmbedUrl?: string
+  miejsca?: { ikona: string; nazwa: string; odleglosc: string }[]
 }) {
+  const MIEJSCA = (miejsca ?? []).map(m => ({ ikona: ICONS[m.ikona], nazwa: m.nazwa, odl: m.odleglosc })).filter(m => m.ikona)
   const gridRef  = useRef<HTMLDivElement>(null)
   const [revealed, setRevealed] = useState(false)
   const [mapActive, setMapActive] = useState(false)
@@ -84,6 +73,7 @@ export default function MapaSection({
         )}
 
         {/* Ikony odległości — 5 kolumn × 2 rzędy */}
+        {MIEJSCA.length > 0 && (
         <div
           ref={gridRef}
           className={`miejsca-grid${revealed ? ' miejsca-revealed' : ''}`}
@@ -109,63 +99,68 @@ export default function MapaSection({
             </div>
           ))}
         </div>
+        )}
 
         {/* Street View — wyśrodkowany */}
-        <div
-          style={{ maxWidth: 960, margin: '0 auto 24px', position: 'relative' }}
-          onMouseLeave={() => setMapActive(false)}
-        >
-          <iframe
-            src={STREET_VIEW_SRC}
-            width="100%"
-            height="480"
-            style={{ border: 0, borderRadius: 16, display: 'block' }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          />
-          {!mapActive && (
-            <div
-              onClick={() => setMapActive(true)}
-              style={{
-                position: 'absolute', inset: 0, borderRadius: 16,
-                cursor: 'pointer', zIndex: 1,
-                display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-                paddingBottom: 16,
-              }}
-            >
-              <span style={{
-                background: 'rgba(0,0,0,0.45)', color: '#fff',
-                fontSize: 12, fontWeight: 600, padding: '5px 12px',
-                borderRadius: 20, pointerEvents: 'none',
-              }}>
-                Kliknij, aby eksplorować
-              </span>
-            </div>
-          )}
-        </div>
+        {streetViewEmbedUrl && (
+          <div
+            style={{ maxWidth: 960, margin: '0 auto 24px', position: 'relative' }}
+            onMouseLeave={() => setMapActive(false)}
+          >
+            <iframe
+              src={streetViewEmbedUrl}
+              width="100%"
+              height="480"
+              style={{ border: 0, borderRadius: 16, display: 'block' }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+            {!mapActive && (
+              <div
+                onClick={() => setMapActive(true)}
+                style={{
+                  position: 'absolute', inset: 0, borderRadius: 16,
+                  cursor: 'pointer', zIndex: 1,
+                  display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
+                  paddingBottom: 16,
+                }}
+              >
+                <span style={{
+                  background: 'rgba(0,0,0,0.45)', color: '#fff',
+                  fontSize: 12, fontWeight: 600, padding: '5px 12px',
+                  borderRadius: 20, pointerEvents: 'none',
+                }}>
+                  Kliknij, aby eksplorować
+                </span>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Przycisk Google Maps */}
-        <div style={{ textAlign: 'center' }}>
-          <a
-            href={GMAPS_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: 'inline-block',
-              padding: '12px 28px',
-              border: `2px solid ${COLORS.navy}`,
-              borderRadius: 25,
-              background: 'transparent',
-              color: COLORS.navy,
-              fontWeight: 700,
-              fontSize: 14,
-              textDecoration: 'none',
-            }}
-          >
-            Otwórz w Google Maps →
-          </a>
-        </div>
+        {googleMapsUrl && (
+          <div style={{ textAlign: 'center' }}>
+            <a
+              href={googleMapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-block',
+                padding: '12px 28px',
+                border: `2px solid ${COLORS.navy}`,
+                borderRadius: 25,
+                background: 'transparent',
+                color: COLORS.navy,
+                fontWeight: 700,
+                fontSize: 14,
+                textDecoration: 'none',
+              }}
+            >
+              Otwórz w Google Maps →
+            </a>
+          </div>
+        )}
 
       </div>
 

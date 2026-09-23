@@ -24,7 +24,7 @@ const IconX = () => (
   </svg>
 )
 
-export default function Navbar({ budynekNazwa }: { budynekNazwa: string }) {
+export default function Navbar({ budynekNazwa, osiedleNazwa }: { budynekNazwa: string; osiedleNazwa?: string }) {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -71,7 +71,7 @@ export default function Navbar({ budynekNazwa }: { budynekNazwa: string }) {
 
         {/* Breadcrumb */}
         <div className="nav-breadcrumb" style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1 }}>
-          <span style={{ fontSize: 12, color: 'rgba(27,45,79,0.45)' }}>Osiedle Nowe Miasto</span>
+          {osiedleNazwa && <span style={{ fontSize: 12, color: 'rgba(27,45,79,0.45)' }}>{osiedleNazwa}</span>}
           <span style={{ color: 'rgba(27,45,79,0.25)', fontSize: 12 }}>/</span>
           <span style={{ fontSize: 13, color: COLORS.navy, fontWeight: 700 }}>{budynekNazwa}</span>
         </div>

@@ -5,6 +5,7 @@ export default {
   fields: [
     { name: 'slug',        title: 'Slug (np. b6)',   type: 'slug', options: { source: 'nazwa' } },
     { name: 'nazwa',       title: 'Nazwa budynku',   type: 'string' },
+    { name: 'osiedle',     title: 'Osiedle',         type: 'reference', to: [{ type: 'osiedle' }], description: 'Do jakiego osiedla/inwestycji należy ten budynek' },
     { name: 'podtytul',    title: 'Podtytuł',        type: 'string' },
     { name: 'opis',        title: 'Opis inwestycji', type: 'array', of: [{ type: 'block' }] },
     { name: 'heroZdjecie', title: 'Zdjęcie hero',    type: 'image', options: { hotspot: true } },

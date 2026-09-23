@@ -47,7 +47,7 @@ function ModalCheckbox({ checked, onChange, text, error, onClear }: {
 function KontaktModal({ lokal, onClose }: { lokal: Lokal; onClose: () => void }) {
   const [form, setForm] = useState({
     imie: '', nazwisko: '', email: '', telefon: '',
-    zapytanie: `Jestem zainteresowany/a Lokalem ${lokal.nr} – ${lokal.budynek?.nazwa ?? 'Osiedle Nowe Miasto'}.\n`,
+    zapytanie: `Jestem zainteresowany/a Lokalem ${lokal.nr} – ${lokal.budynek?.nazwa ?? 'Matbet'}.\n`,
   })
   const [zgoda1, setZgoda1] = useState(false)
   const [zgoda2, setZgoda2] = useState(false)
@@ -494,7 +494,7 @@ export default function KartaLokalu({ lokal }: { lokal: Lokal }) {
           <button
             onClick={() => {
               const prev = document.title
-              document.title = `Karta lokalu ${lokal.nr} - Osiedle Nowe Miasto${lokal.budynek?.nazwa ? ` - ${lokal.budynek.nazwa}` : ''}`
+              document.title = `Karta lokalu ${lokal.nr}${lokal.budynek?.osiedle?.nazwa ? ` - ${lokal.budynek.osiedle.nazwa}` : ''}${lokal.budynek?.nazwa ? ` - ${lokal.budynek.nazwa}` : ''}`
               // Rozpoznajemy mobile po realnej szerokości ekranu urządzenia (nie po
               // orientacji wydruku - ta bywa myląca, np. Chrome na Windows potrafi
               // wystartować w pionie z przyczyn niezwiązanych z urządzeniem).

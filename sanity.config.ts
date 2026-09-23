@@ -24,16 +24,16 @@ export default defineConfig({
   ],
 
   document: {
-    // Ukryj "budynek" w globalnym menu "Utwórz nowy" dla nie-adminów
+    // Ukryj "budynek"/"osiedle" w globalnym menu "Utwórz nowy" dla nie-adminów
     newDocumentOptions: (prev, { currentUser }) => {
       const isAdmin = currentUser?.roles.some(r => r.name === 'administrator') ?? false
       if (isAdmin) return prev
-      return prev.filter(option => option.templateId !== 'budynek')
+      return prev.filter(option => option.templateId !== 'budynek' && option.templateId !== 'osiedle')
     },
 
-    // Zablokuj wszystkie akcje na budynku dla nie-adminów
+    // Zablokuj wszystkie akcje na budynku/osiedlu dla nie-adminów
     actions: (prev, { schemaType, currentUser }) => {
-      if (schemaType !== 'budynek') return prev
+      if (schemaType !== 'budynek' && schemaType !== 'osiedle') return prev
       const isAdmin = currentUser?.roles.some(r => r.name === 'administrator') ?? false
       if (isAdmin) return prev
       return []

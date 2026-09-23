@@ -69,17 +69,17 @@ const IkonaTabela = () => (
 )
 
 // ─── Modal porównywarki ────────────────────────────────────────────────────────
-function Porownywarka({ lokale, onClose }: { lokale: Lokal[]; onClose: () => void }) {
+function Porownywarka({ lokale, onClose, osiedleNazwa, osiedleMiasto }: { lokale: Lokal[]; onClose: () => void; osiedleNazwa?: string; osiedleMiasto?: string }) {
   const n = lokale.length
 
   const handlePrint = () => {
     const d = new Intl.DateTimeFormat('pl-PL', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date())
     const nrs = lokale.map(l => l.nr)
-    const budNazwa = lokale[0]?.budynek?.nazwa ?? 'Budynek B6'
+    const budNazwa = lokale[0]?.budynek?.nazwa ?? 'Matbet'
     const nrsStr = nrs.length >= 2
       ? nrs.slice(0, -1).join(', ') + ' i ' + nrs[nrs.length - 1]
       : nrs[0] ?? ''
-    const tytulPDF = `Porównanie lokali ${nrsStr} - ${budNazwa} - Osiedle Nowe Miasto`
+    const tytulPDF = `Porównanie lokali ${nrsStr} - ${budNazwa}${osiedleNazwa ? ` - ${osiedleNazwa}` : ''}`
     const logoUrl = window.location.origin + '/Logo%20-%20Matbet%20-%20bia%C5%82e.png'
     const fmtC = (v: number) => new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN', maximumFractionDigits: 0 }).format(v)
     const ceny = lokale.map(l => Math.round((l.cenaZaMetr ?? 0) * l.powierzchnia))
@@ -125,7 +125,7 @@ table{width:100%;border-collapse:collapse}
 @media print{*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}@page{size:A4 landscape;margin:8mm}body{padding:0;margin:0;zoom:0.9}img{max-height:90px!important;width:auto!important}td,th{padding:6px 10px!important}}</style></head>
 <body>
 <h1>Porównanie lokali</h1>
-<div class="sub">Matbet — Osiedle Nowe Miasto, Słupsk</div>
+<div class="sub">Matbet${[osiedleNazwa, osiedleMiasto].filter(Boolean).length ? ' — ' + [osiedleNazwa, osiedleMiasto].filter(Boolean).join(', ') : ''}</div>
 <table>
 <thead><tr style="background:#1B2D4F">
 <th style="padding:12px 16px;border:1px solid #2d3f5a;width:140px"></th>
@@ -331,7 +331,7 @@ function PasekPorownania({ wybrane, lokale, onToggle, onOpen, onClear }: {
 }
 
 // ─── Główny komponent sekcji ───────────────────────────────────────────────────
-export default function WyszukiwarkaSection({ lokale, budynekNazwa }: { lokale: Lokal[]; budynekNazwa?: string }) {
+export default function WyszukiwarkaSection({ lokale, budynekNazwa, osiedleNazwa, osiedleMiasto }: { lokale: Lokal[]; budynekNazwa?: string; osiedleNazwa?: string; osiedleMiasto?: string }) {
   const router = useRouter()
 
   const [filtry, setFiltry]         = useState(INIT_FILTRY)
@@ -465,11 +465,11 @@ export default function WyszukiwarkaSection({ lokale, budynekNazwa }: { lokale: 
   return (
     <section id="mieszkania" style={{ paddingTop: 80, paddingBottom: porownaj.length > 0 ? 90 : 0, background: '#F4EFE6', fontFamily: 'inherit', scrollMarginTop: 48 }}>
 
-      {showModal && <Porownywarka lokale={wybraneObiekty} onClose={() => setShowModal(false)} />}
+      {showModal && <Porownywarka lokale={wybraneObiekty} onClose={() => setShowModal(false)} osiedleNazwa={osiedleNazwa} osiedleMiasto={osiedleMiasto} />}
 
       {/* Nagłówek sekcji */}
       <div style={{ textAlign: 'center', paddingBottom: 40, paddingTop: 8 }}>
-        <p style={{ fontSize: 12, letterSpacing: 2, color: '#A8423A', fontWeight: 700, textTransform: 'uppercase', marginBottom: 12 }}>NOWE MIASTO{budynekNazwa ? `, ${budynekNazwa.toUpperCase()}` : ''}</p>
+        <p style={{ fontSize: 12, letterSpacing: 2, color: '#A8423A', fontWeight: 700, textTransform: 'uppercase', marginBottom: 12 }}>{(osiedleNazwa ?? 'MATBET').toUpperCase()}{budynekNazwa ? `, ${budynekNazwa.toUpperCase()}` : ''}</p>
         <h2 style={{ fontSize: 36, fontWeight: 800, color: COLORS.navy, marginBottom: 12 }}>Znajdź mieszkanie</h2>
         <p style={{ fontSize: 16, color: '#6B7280' }}>Wybierz lokal dopasowany do Twoich potrzeb</p>
       </div>

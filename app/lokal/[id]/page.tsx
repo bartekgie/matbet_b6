@@ -10,16 +10,18 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const lokal = await client.fetch(LOKAL_QUERY, { id })
   if (!lokal) return {}
 
-  const budynekNazwa = lokal.budynek?.nazwa ?? 'Matbet'
-  const budynekSlug  = lokal.budynek?.slug ?? ''
+  const budynekNazwa  = lokal.budynek?.nazwa ?? 'Matbet'
+  const budynekSlug   = lokal.budynek?.slug ?? ''
+  const osiedleNazwa  = lokal.budynek?.osiedle?.nazwa
+  const miasto        = lokal.budynek?.osiedle?.miasto
   const pokoje = lokal.pokoje === 1 ? '1 pokój' : `${lokal.pokoje} pokoje`
   const pietro = lokal.pietro === 0 ? 'parter' : `${lokal.pietro}. piętro`
   const cena   = lokal.cenaZaMetr ? Math.round(lokal.cenaZaMetr * lokal.powierzchnia) : null
   const cenaStr = cena ? ` Cena: ${cena.toLocaleString('pl-PL')} zł.` : ''
 
   const title = `Lokal ${lokal.nr} – ${lokal.powierzchnia} m², ${pokoje} | ${budynekNazwa}`
-  const description = `Lokal ${lokal.nr} w ${budynekNazwa}, Słupsk – ${lokal.powierzchnia} m², ${pokoje}, ${pietro}.${cenaStr} Deweloper Matbet, Osiedle Nowe Miasto.`
-  const url = `https://www.matbet.com.pl/lokal/${id}`
+  const description = `Lokal ${lokal.nr} w ${budynekNazwa}${miasto ? `, ${miasto}` : ''} – ${lokal.powierzchnia} m², ${pokoje}, ${pietro}.${cenaStr} Deweloper Matbet${osiedleNazwa ? `, ${osiedleNazwa}` : ''}.`
+  const url = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://nowemiasto.matbet.com.pl'}/lokal/${id}`
   const image = lokal.zdjecia?.[0] ?? lokal.rzutUrl
 
   return {
@@ -51,7 +53,7 @@ export default async function LokalPage({ params }: { params: Promise<{ id: stri
 
   return (
     <>
-      <Navbar budynekNazwa={lokal.budynek?.nazwa ?? ''} />
+      <Navbar budynekNazwa={lokal.budynek?.nazwa ?? ''} osiedleNazwa={lokal.budynek?.osiedle?.nazwa} />
       <KartaLokalu lokal={lokal} />
       <Footer />
     </>

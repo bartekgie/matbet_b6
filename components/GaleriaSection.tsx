@@ -35,7 +35,7 @@ function Thumb({ item, index, onClick, sizes = '25vw' }: {
   )
 }
 
-export default function GaleriaSection({ galeria }: { galeria: GaleriaItem[] }) {
+export default function GaleriaSection({ galeria, osiedleNazwa }: { galeria: GaleriaItem[]; osiedleNazwa?: string }) {
   const [lightbox, setLightbox] = useState<{ open: boolean; index: number }>({ open: false, index: 0 })
 
   if (!galeria || galeria.length === 0) return null
@@ -126,7 +126,7 @@ export default function GaleriaSection({ galeria }: { galeria: GaleriaItem[] }) 
 
         {/* Nagłówek */}
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <h2 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', fontWeight: 800, color: COLORS.navy }}>Osiedle Nowe Miasto</h2>
+          <h2 style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', fontWeight: 800, color: COLORS.navy }}>{osiedleNazwa || 'Galeria'}</h2>
         </div>
 
         {/* Siatka Airbnb-style */}

@@ -19,7 +19,7 @@ const STATYSTYKI = [
   { val: '6',       label: 'aktywnych projektów' },
 ]
 
-const FALLBACK_TEXT = 'Nowe Miasto to dynamicznie rozwijające się osiedle położone w zachodniej części Słupska, stanowiące część dzielnicy Niepodległości. Atrakcyjna lokalizacja to idealne miejsce dla osób pragnących spokojnej okolicy pełnej zieleni oraz łatwego dostępu do infrastruktury miejskiej. Na terenie osiedla powstają pięciopiętrowe budynki o wysokim standardzie, z windami, garażami i miejscami parkingowymi.'
+const FALLBACK_TEXT = 'To dynamicznie rozwijająca się inwestycja w atrakcyjnej lokalizacji, idealne miejsce dla osób pragnących spokojnej okolicy pełnej zieleni oraz łatwego dostępu do infrastruktury miejskiej. Na terenie osiedla powstają nowoczesne budynki o wysokim standardzie, z windami, garażami i miejscami parkingowymi.'
 
 function ptToBlocks(blocks: { _type: string; children?: { text?: string }[] }[]): string[] {
   return (blocks ?? [])
@@ -230,14 +230,14 @@ export default function InwestycjaSection({ budynek }: { budynek: Budynek }) {
             fontSize: 12, color: COLORS.red, letterSpacing: 2,
             fontWeight: 700, textTransform: 'uppercase', marginBottom: 14,
           }}>
-            OSIEDLE NOWE MIASTO
+            {(budynek.osiedle?.nazwa ?? 'INWESTYCJA').toUpperCase()}
           </p>
           <h2 style={{
             fontSize: 'clamp(26px, 3.5vw, 38px)',
             fontWeight: 800, color: COLORS.navy,
             marginBottom: 18, lineHeight: 1.15,
           }}>
-            Największa inwestycja w Słupsku
+            Nasza największa inwestycja
           </h2>
           {paragraphs.map((p, i) => (
             <p key={i} style={{
