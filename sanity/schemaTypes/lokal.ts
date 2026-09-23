@@ -80,6 +80,7 @@ export default {
                 { title: 'Łazienka',                 value: 'Łazienka' },
                 { title: 'Przedpokój',               value: 'Przedpokój' },
                 { title: 'Balkon',                   value: 'Balkon' },
+                { title: 'Loggia',                   value: 'Loggia' },
                 { title: 'Garderoba',                value: 'Garderoba' },
                 { title: 'Korytarz',                 value: 'Korytarz' },
               ],
