@@ -93,7 +93,7 @@ function KontaktModal({ lokal, onClose }: { lokal: Lokal; onClose: () => void })
       const res = await fetch('/api/kontakt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, lokalNr: lokal.nr, budynekNazwa: lokal.budynek?.nazwa }),
+        body: JSON.stringify({ ...form, lokalNr: lokal.nr, budynekNazwa: lokal.budynek?.nazwa, osiedleNazwa: lokal.budynek?.osiedle?.nazwa }),
       })
       setStatus(res.ok ? 'ok' : 'error')
     } catch { setStatus('error') }

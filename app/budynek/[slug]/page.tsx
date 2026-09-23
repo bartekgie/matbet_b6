@@ -69,7 +69,7 @@ export default async function BudynekPage({ params }: { params: Promise<{ slug: 
           streetViewEmbedUrl={budynek.osiedle?.streetViewEmbedUrl}
           miejsca={budynek.osiedle?.miejscaWOkolicy}
         />
-        <FormularzSection budynekNazwa={budynek.nazwa} />
+        <FormularzSection budynekNazwa={budynek.nazwa} osiedleNazwa={osiedleNazwa} />
       </main>
       <Footer />
     </>

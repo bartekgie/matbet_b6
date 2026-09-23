@@ -20,7 +20,7 @@ const KLAUZULA = `Dane osobowe przetwarzane są zgodnie z art. 23 ust.1 pkt. 5 u
 type Fields = { imie: string; nazwisko: string; email: string; telefon: string; zapytanie: string }
 type Status = 'idle' | 'sending' | 'ok' | 'error'
 
-export default function FormularzSection({ budynekNazwa }: { budynekNazwa?: string }) {
+export default function FormularzSection({ budynekNazwa, osiedleNazwa }: { budynekNazwa?: string; osiedleNazwa?: string }) {
   const [form, setForm]   = useState<Fields>({ imie: '', nazwisko: '', email: '', telefon: '', zapytanie: '' })
   const [zgoda1, setZgoda1] = useState(false)
   const [zgoda2, setZgoda2] = useState(false)
@@ -56,7 +56,7 @@ export default function FormularzSection({ budynekNazwa }: { budynekNazwa?: stri
       const res = await fetch('/api/kontakt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, budynekNazwa }),
+        body: JSON.stringify({ ...form, budynekNazwa, osiedleNazwa }),
       })
       setStatus(res.ok ? 'ok' : 'error')
     } catch {

@@ -5,25 +5,27 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(req: Request) {
   try {
-    const { imie, nazwisko, email, telefon, zapytanie, lokalNr, budynekNazwa } = await req.json()
+    const { imie, nazwisko, email, telefon, zapytanie, lokalNr, budynekNazwa, osiedleNazwa } = await req.json()
+
+    const budynekZOsiedlem = [budynekNazwa, osiedleNazwa].filter(Boolean).join(', ')
 
     const subject = lokalNr
-      ? `Lokal ${lokalNr} (${budynekNazwa ?? 'Matbet'}) – zapytanie od ${imie} ${nazwisko}`
-      : budynekNazwa
-        ? `Zapytanie o lokal (${budynekNazwa}) – zapytanie od ${imie} ${nazwisko}`
+      ? `Lokal ${lokalNr} (${budynekZOsiedlem || 'Matbet'}) – zapytanie od ${imie} ${nazwisko}`
+      : budynekZOsiedlem
+        ? `Zapytanie o lokal (${budynekZOsiedlem}) – zapytanie od ${imie} ${nazwisko}`
         : `Zapytanie o lokal – ${imie} ${nazwisko}`
 
     const { error } = await resend.emails.send({
-      from:    'Nowe Miasto Matbet <nowemiasto@matbet.com.pl>',
+      from:    'Matbet <nowemiasto@matbet.com.pl>',
       to:      [process.env.MAIL_TO || 'bartosz.giecewicz@gmail.com'],
       subject,
       html: `
         <h2 style="color:#1B2D4F">Nowe zapytanie z formularza</h2>
         <table style="border-collapse:collapse;width:100%;max-width:500px">
           ${lokalNr
-            ? `<tr><td style="padding:8px 12px;background:#1B2D4F;color:#fff;font-weight:700;width:120px">Lokal</td><td style="padding:8px 12px;border-bottom:1px solid #eee;font-weight:700">${lokalNr} – ${budynekNazwa ?? ''}</td></tr>`
-            : budynekNazwa
-              ? `<tr><td style="padding:8px 12px;background:#1B2D4F;color:#fff;font-weight:700;width:120px">Budynek</td><td style="padding:8px 12px;border-bottom:1px solid #eee;font-weight:700">${budynekNazwa}</td></tr>`
+            ? `<tr><td style="padding:8px 12px;background:#1B2D4F;color:#fff;font-weight:700;width:120px">Lokal</td><td style="padding:8px 12px;border-bottom:1px solid #eee;font-weight:700">${lokalNr} – ${budynekZOsiedlem}</td></tr>`
+            : budynekZOsiedlem
+              ? `<tr><td style="padding:8px 12px;background:#1B2D4F;color:#fff;font-weight:700;width:120px">Budynek</td><td style="padding:8px 12px;border-bottom:1px solid #eee;font-weight:700">${budynekZOsiedlem}</td></tr>`
               : ''}
           <tr><td style="padding:8px 12px;background:#f5f7fa;font-weight:600;width:120px">Imię</td><td style="padding:8px 12px;border-bottom:1px solid #eee">${imie}</td></tr>
           <tr><td style="padding:8px 12px;background:#f5f7fa;font-weight:600">Nazwisko</td><td style="padding:8px 12px;border-bottom:1px solid #eee">${nazwisko}</td></tr>
